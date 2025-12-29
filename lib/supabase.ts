@@ -2,19 +2,9 @@ import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import * as Linking from 'expo-linking';
-import { Alert } from 'react-native';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
-
-console.log('🔧 Supabase Configuration:');
-console.log('URL:', supabaseUrl ? '✓ Set' : '✗ Missing');
-console.log('Anon Key:', supabaseAnonKey ? '✓ Set' : '✗ Missing');
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ Missing Supabase credentials!');
-  Alert.alert('Configuration Error', 'Supabase credentials are missing. Please check your environment variables.');
-}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -26,74 +16,34 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 supabase.auth.onAuthStateChange((event, session) => {
-  console.log('🔐 Auth State Changed:', event);
-  
+  console.log('Auth event:', event);
   if (event === 'SIGNED_IN' && session) {
-    console.log('✅ User signed in:');
-    console.log('  - Email:', session.user.email);
-    console.log('  - Email Confirmed:', session.user.email_confirmed_at ? '✓' : '✗');
-    console.log('  - User ID:', session.user.id);
+    console.log('User signed in:', session.user.email);
   }
-  
-  if (event === 'SIGNED_OUT') {
-    console.log('👋 User signed out');
-  }
-  
   if (event === 'USER_UPDATED') {
-    console.log('🔄 User updated');
-    if (session?.user) {
-      console.log('  - Email Confirmed:', session.user.email_confirmed_at ? '✓' : '✗');
-    }
-  }
-  
-  if (event === 'TOKEN_REFRESHED') {
-    console.log('🔄 Token refreshed');
+    console.log('User updated');
   }
 });
 
-Linking.addEventListener('url', async ({ url }) => {
-  console.log('🔗 Deep link received:', url);
+Linking.addEventListener('url', ({ url }) => {
+  console.log('Deep link received:', url);
+  const { path, queryParams } = Linking.parse(url);
   
-  try {
-    const { path, queryParams } = Linking.parse(url);
-    console.log('📍 Parsed path:', path);
-    console.log('📋 Query params:', queryParams);
+  if (path === 'auth/confirm' && queryParams) {
+    const token = queryParams.token as string;
+    const type = queryParams.type as string;
     
-    if (path === 'auth/confirm') {
-      console.log('✉️ Email confirmation link detected');
-      
-      if (queryParams) {
-        const token_hash = queryParams.token_hash as string || queryParams.token as string;
-        const type = queryParams.type as string;
-        
-        console.log('🎫 Token hash:', token_hash ? '✓ Present' : '✗ Missing');
-        console.log('📝 Type:', type);
-        
-        if (token_hash && type) {
-          console.log('⏳ Verifying email...');
-          
-          const { data, error } = await supabase.auth.verifyOtp({
-            token_hash,
-            type: type as any,
-          });
-          
-          if (error) {
-            console.error('❌ Email confirmation error:', error.message);
-            Alert.alert('Confirmation Failed', error.message);
-          } else {
-            console.log('✅ Email confirmed successfully!');
-            console.log('👤 User:', data.user?.email);
-            Alert.alert('Success! ✓', 'Your email has been confirmed. You can now sign in.');
-          }
+    if (token && type === 'email') {
+      supabase.auth.verifyOtp({
+        token_hash: token,
+        type: 'email',
+      }).then(({ error }) => {
+        if (error) {
+          console.error('Email confirmation error:', error);
         } else {
-          console.error('❌ Missing token or type in confirmation link');
-          Alert.alert('Invalid Link', 'The confirmation link is missing required parameters.');
+          console.log('Email confirmed successfully');
         }
-      } else {
-        console.error('❌ No query params in confirmation link');
-      }
+      });
     }
-  } catch (error) {
-    console.error('❌ Error processing deep link:', error);
   }
 });

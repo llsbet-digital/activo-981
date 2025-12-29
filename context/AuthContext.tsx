@@ -26,80 +26,42 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const signUp = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
     try {
-      console.log('📝 Attempting to sign up user:', email);
-      
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: 'rork-app://auth/confirm',
+          emailRedirectTo: 'myapp://auth/confirm',
         },
       });
-      
-      if (error) {
-        console.error('❌ Sign up error:', error.message);
-      } else {
-        console.log('✅ Sign up successful!');
-        console.log('👤 User ID:', data.user?.id);
-        console.log('✉️ Email confirmed:', data.user?.email_confirmed_at ? '✓' : '✗ Needs confirmation');
-        console.log('📧 Confirmation email should be sent to:', email);
-      }
-      
       return { error };
     } catch (error) {
-      console.error('❌ Sign up exception:', error);
+      console.error('Sign up error:', error);
       return { error: error as AuthError };
     }
   };
 
   const resendConfirmationEmail = async (email: string): Promise<{ error: AuthError | null }> => {
     try {
-      console.log('📧 Resending confirmation email to:', email);
-      
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email,
-        options: {
-          emailRedirectTo: 'rork-app://auth/confirm',
-        },
       });
-      
-      if (error) {
-        console.error('❌ Resend error:', error.message);
-      } else {
-        console.log('✅ Confirmation email resent successfully');
-      }
-      
       return { error };
     } catch (error) {
-      console.error('❌ Resend exception:', error);
+      console.error('Resend confirmation error:', error);
       return { error: error as AuthError };
     }
   };
 
   const signIn = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
     try {
-      console.log('🔐 Attempting to sign in user:', email);
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      
-      if (error) {
-        console.error('❌ Sign in error:', error.message);
-        if (error.message.includes('Email not confirmed')) {
-          console.log('⚠️ Email not confirmed yet');
-        }
-      } else {
-        console.log('✅ Sign in successful!');
-        console.log('👤 User:', data.user?.email);
-        console.log('✉️ Email confirmed:', data.user?.email_confirmed_at ? '✓' : '✗');
-      }
-      
       return { error };
     } catch (error) {
-      console.error('❌ Sign in exception:', error);
+      console.error('Sign in error:', error);
       return { error: error as AuthError };
     }
   };

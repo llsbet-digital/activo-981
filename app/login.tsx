@@ -37,7 +37,6 @@ export default function LoginScreen() {
     }
 
     setIsLoading(true);
-    console.log(`🚀 ${isSignUp ? 'Sign up' : 'Sign in'} initiated for:`, email);
 
     try {
       const { error } = isSignUp
@@ -45,36 +44,21 @@ export default function LoginScreen() {
         : await signIn(email, password);
 
       if (error) {
-        console.error('❌ Auth failed:', error.message);
-        
-        if (error.message.includes('Email not confirmed')) {
-          setPendingEmail(email);
-          setShowResendEmail(true);
-          Alert.alert(
-            'Email Not Confirmed',
-            'Please check your email and click the confirmation link before signing in. You can also request a new confirmation email below.',
-            [{ text: 'OK' }]
-          );
-        } else {
-          Alert.alert('Error', error.message);
-        }
+        Alert.alert('Error', error.message);
       } else {
         if (isSignUp) {
-          console.log('✅ Sign up successful, email confirmation required');
           setPendingEmail(email);
           setShowResendEmail(true);
           Alert.alert(
             'Check Your Email 📧',
-            `We've sent a confirmation link to ${email}.\n\nPlease check your inbox (and spam folder) and click the link to verify your email.`,
+            `We've sent a confirmation link to ${email}. Please verify your email to continue.`,
             [{ text: 'OK' }]
           );
-        } else {
-          console.log('✅ Sign in successful');
         }
       }
     } catch (error) {
-      console.error('❌ Auth exception:', error);
       Alert.alert('Error', 'An unexpected error occurred');
+      console.error('Auth error:', error);
     } finally {
       setIsLoading(false);
     }
