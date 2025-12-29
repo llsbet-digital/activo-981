@@ -6,6 +6,15 @@ import * as Linking from 'expo-linking';
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('❌ Supabase environment variables missing!');
+  console.error('EXPO_PUBLIC_SUPABASE_URL:', supabaseUrl ? '✓ Set' : '✗ Missing');
+  console.error('EXPO_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✓ Set' : '✗ Missing');
+}
+
+console.log('🔧 Initializing Supabase client...');
+console.log('Supabase URL:', supabaseUrl);
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: AsyncStorage,

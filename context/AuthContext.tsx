@@ -26,6 +26,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const signUp = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
     try {
+      console.log('🔐 Attempting sign up...');
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -33,10 +34,21 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
           emailRedirectTo: 'myapp://auth/confirm',
         },
       });
+      if (error) {
+        console.error('❌ Sign up error:', error.message);
+      } else {
+        console.log('✅ Sign up successful');
+      }
       return { error };
-    } catch (error) {
-      console.error('Sign up error:', error);
-      return { error: error as AuthError };
+    } catch (error: any) {
+      console.error('❌ Sign up exception:', error);
+      return { 
+        error: {
+          name: error?.name || 'AuthError',
+          message: error?.message || 'Failed to connect to authentication service. Please check your internet connection and try again.',
+          status: error?.status || 0,
+        } as unknown as AuthError
+      };
     }
   };
 
@@ -55,14 +67,26 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const signIn = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
     try {
+      console.log('🔐 Attempting sign in...');
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+      if (error) {
+        console.error('❌ Sign in error:', error.message);
+      } else {
+        console.log('✅ Sign in successful');
+      }
       return { error };
-    } catch (error) {
-      console.error('Sign in error:', error);
-      return { error: error as AuthError };
+    } catch (error: any) {
+      console.error('❌ Sign in exception:', error);
+      return { 
+        error: {
+          name: error?.name || 'AuthError',
+          message: error?.message || 'Failed to connect to authentication service. Please check your internet connection and try again.',
+          status: error?.status || 0,
+        } as unknown as AuthError
+      };
     }
   };
 
