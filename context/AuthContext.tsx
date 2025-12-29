@@ -27,6 +27,20 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   const signUp = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
     try {
       console.log('🔐 Attempting sign up...');
+      console.log('Email:', email);
+      console.log('Supabase URL:', process.env.EXPO_PUBLIC_SUPABASE_URL);
+      
+      if (!process.env.EXPO_PUBLIC_SUPABASE_URL || !process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY) {
+        console.error('❌ Environment variables not set!');
+        return {
+          error: {
+            name: 'ConfigError',
+            message: 'Supabase configuration is missing. Please check environment variables.',
+            status: 0,
+          } as unknown as AuthError
+        };
+      }
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -36,12 +50,15 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       });
       if (error) {
         console.error('❌ Sign up error:', error.message);
+        console.error('Error details:', error);
       } else {
         console.log('✅ Sign up successful');
       }
       return { error };
     } catch (error: any) {
       console.error('❌ Sign up exception:', error);
+      console.error('Error type:', typeof error);
+      console.error('Error keys:', Object.keys(error || {}));
       return { 
         error: {
           name: error?.name || 'AuthError',

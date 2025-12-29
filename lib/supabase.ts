@@ -6,14 +6,24 @@ import * as Linking from 'expo-linking';
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
+console.log('🔧 Checking Supabase configuration...');
+console.log('EXPO_PUBLIC_SUPABASE_URL:', supabaseUrl || '❌ NOT SET');
+console.log('EXPO_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✓ Set (length: ' + supabaseAnonKey.length + ')' : '❌ NOT SET');
+
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ Supabase environment variables missing!');
-  console.error('EXPO_PUBLIC_SUPABASE_URL:', supabaseUrl ? '✓ Set' : '✗ Missing');
-  console.error('EXPO_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✓ Set' : '✗ Missing');
+  console.error('❌ CRITICAL: Supabase environment variables missing!');
+  console.error('Please set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY');
+  console.error('Current values:');
+  console.error('  EXPO_PUBLIC_SUPABASE_URL:', supabaseUrl || 'MISSING');
+  console.error('  EXPO_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'SET' : 'MISSING');
+}
+
+if (supabaseUrl && !supabaseUrl.startsWith('https://')) {
+  console.error('❌ CRITICAL: Supabase URL must start with https://');
+  console.error('Current URL:', supabaseUrl);
 }
 
 console.log('🔧 Initializing Supabase client...');
-console.log('Supabase URL:', supabaseUrl);
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
