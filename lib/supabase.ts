@@ -24,6 +24,22 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
+export async function testSupabaseConnection() {
+  try {
+    console.log('🧪 Testing Supabase connection...');
+    const { error } = await supabase.from('profiles').select('count').limit(1);
+    if (error) {
+      console.log('⚠️ Supabase connection test:', error.message);
+      return false;
+    }
+    console.log('✅ Supabase connected successfully!');
+    return true;
+  } catch (err) {
+    console.error('❌ Supabase connection failed:', err);
+    return false;
+  }
+}
+
 supabase.auth.onAuthStateChange((event, session) => {
   console.log('Auth event:', event);
   if (event === 'SIGNED_IN' && session) {
