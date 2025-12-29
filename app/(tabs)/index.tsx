@@ -13,16 +13,10 @@ export default function HomeScreen() {
   const { profile, activities, weeklyStats, onboardingCompleted, isLoading } = useApp();
 
   useEffect(() => {
-    console.log('🏠 Home screen - Auth status:', { isAuthenticated, authLoading, isLoading, onboardingCompleted });
-    
     if (!authLoading && !isAuthenticated) {
-      console.log('➡️ Redirecting to login');
       router.replace('/login');
     } else if (!isLoading && !onboardingCompleted && isAuthenticated) {
-      console.log('➡️ Redirecting to onboarding');
       router.replace('/onboarding');
-    } else if (isAuthenticated && onboardingCompleted) {
-      console.log('✅ User is authenticated and onboarded');
     }
   }, [isAuthenticated, authLoading, isLoading, onboardingCompleted]);
 

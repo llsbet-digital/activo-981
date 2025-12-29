@@ -2,7 +2,7 @@ import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import * as Linking from 'expo-linking';
-import { Alert, Platform } from 'react-native';
+import { Alert } from 'react-native';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -10,14 +10,10 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 console.log('🔧 Supabase Configuration:');
 console.log('URL:', supabaseUrl ? '✓ Set' : '✗ Missing');
 console.log('Anon Key:', supabaseAnonKey ? '✓ Set' : '✗ Missing');
-console.log('Full URL:', supabaseUrl);
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('❌ Missing Supabase credentials!');
-  console.error('Please ensure EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY are set');
-  if (Platform.OS !== 'web') {
-    Alert.alert('Configuration Error', 'Supabase credentials are missing. Please check your environment variables.');
-  }
+  Alert.alert('Configuration Error', 'Supabase credentials are missing. Please check your environment variables.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -25,7 +21,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storage: AsyncStorage,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: Platform.OS === 'web',
+    detectSessionInUrl: false,
   },
 });
 
@@ -55,7 +51,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   }
 });
 
-const handleDeepLink = async (url: string) => {
+Linking.addEventListener('url', async ({ url }) => {
   console.log('🔗 Deep link received:', url);
   
   try {
@@ -63,7 +59,7 @@ const handleDeepLink = async (url: string) => {
     console.log('📍 Parsed path:', path);
     console.log('📋 Query params:', queryParams);
     
-    if (path === 'auth/confirm' || path === 'confirm') {
+    if (path === 'auth/confirm') {
       console.log('✉️ Email confirmation link detected');
       
       if (queryParams) {
@@ -96,23 +92,8 @@ const handleDeepLink = async (url: string) => {
       } else {
         console.error('❌ No query params in confirmation link');
       }
-    } else if (path === 'auth/reset' || path === 'reset') {
-      console.log('🔐 Password reset link detected');
     }
   } catch (error) {
     console.error('❌ Error processing deep link:', error);
   }
-};
-
-if (Platform.OS !== 'web') {
-  Linking.addEventListener('url', async ({ url }) => {
-    await handleDeepLink(url);
-  });
-
-  Linking.getInitialURL().then((url) => {
-    if (url) {
-      console.log('🔗 Initial URL detected:', url);
-      handleDeepLink(url);
-    }
-  });
-}
+});

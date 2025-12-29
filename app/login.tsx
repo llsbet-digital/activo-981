@@ -16,7 +16,7 @@ import { colors } from '@/constants/colors';
 import { StatusBar } from 'expo-status-bar';
 
 export default function LoginScreen() {
-  const { signIn, signUp, resendConfirmationEmail, resetPassword } = useAuth();
+  const { signIn, signUp, resendConfirmationEmail } = useAuth();
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -24,8 +24,6 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showResendEmail, setShowResendEmail] = useState<boolean>(false);
   const [pendingEmail, setPendingEmail] = useState<string>('');
-  const [showForgotPassword, setShowForgotPassword] = useState<boolean>(false);
-  const [resetEmail, setResetEmail] = useState<string>('');
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -108,40 +106,6 @@ export default function LoginScreen() {
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!resetEmail || !resetEmail.includes('@')) {
-      Alert.alert('Error', 'Please enter a valid email address');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { error } = await resetPassword(resetEmail);
-      if (error) {
-        Alert.alert('Error', error.message);
-      } else {
-        Alert.alert(
-          'Check Your Email 📧',
-          `We've sent password reset instructions to ${resetEmail}.\n\nPlease check your inbox and follow the link to reset your password.`,
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                setShowForgotPassword(false);
-                setResetEmail('');
-              },
-            },
-          ]
-        );
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to send reset email');
-      console.error('Password reset error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -211,19 +175,6 @@ export default function LoginScreen() {
             </View>
           )}
 
-          {!isSignUp && (
-            <TouchableOpacity
-              style={styles.forgotPasswordButton}
-              onPress={() => {
-                setResetEmail(email);
-                setShowForgotPassword(true);
-              }}
-              disabled={isLoading}
-            >
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
-          )}
-
           <TouchableOpacity
             style={[styles.button, isLoading && styles.buttonDisabled]}
             onPress={handleAuth}
@@ -272,48 +223,6 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
         </View>
-
-        {showForgotPassword && (
-          <View style={styles.modal}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Reset Password</Text>
-              <Text style={styles.modalDescription}>
-                Enter your email address and we&apos;ll send you instructions to reset your password.
-              </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="your@email.com"
-                placeholderTextColor={colors.textMuted}
-                value={resetEmail}
-                onChangeText={setResetEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                autoComplete="email"
-              />
-              <TouchableOpacity
-                style={[styles.button, isLoading && styles.buttonDisabled]}
-                onPress={handleForgotPassword}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.buttonText}>Send Reset Link</Text>
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalCancelButton}
-                onPress={() => {
-                  setShowForgotPassword(false);
-                  setResetEmail('');
-                }}
-                disabled={isLoading}
-              >
-                <Text style={styles.modalCancelText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -406,55 +315,5 @@ const styles = StyleSheet.create({
   resendTextBold: {
     fontWeight: '600' as const,
     color: colors.primary,
-  },
-  forgotPasswordButton: {
-    alignSelf: 'flex-end',
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '600' as const,
-  },
-  modal: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  modalContent: {
-    backgroundColor: colors.backgroundCard,
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-    maxWidth: 400,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: '700' as const,
-    color: colors.text,
-    marginBottom: 12,
-  },
-  modalDescription: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 24,
-    lineHeight: 20,
-  },
-  modalCancelButton: {
-    marginTop: 12,
-    padding: 16,
-    alignItems: 'center',
-  },
-  modalCancelText: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    fontWeight: '600' as const,
   },
 });

@@ -40,60 +40,12 @@ This will create:
 - Indexes for optimal query performance
 - Auto-update triggers for timestamp fields
 
-## 4. Configure Authentication (CRITICAL)
+## 4. Configure Authentication
 
-### Email Provider Settings
-
-1. Go to **Authentication** > **Providers** in Supabase dashboard
-2. Click on **Email** provider
-3. Make sure these settings are configured:
-   - ✅ **Enable Email provider** is ON
-   - ✅ **Confirm email** - Choose your preference:
-     - **Development**: Turn OFF to skip email confirmation (faster testing)
-     - **Production**: Turn ON for security
-   - ✅ **Secure email change** - ON (recommended)
-
-### Site URL Configuration (IMPORTANT)
-
-1. Go to **Authentication** > **URL Configuration**
-2. Set your **Site URL**:
-   - For development: `exp://localhost:8081` or your Expo dev URL
-   - For production: Your actual app URL
-3. Add **Redirect URLs** (one per line):
-   ```
-   rork-app://auth/confirm
-   rork-app://auth/reset
-   exp://localhost:8081
-   http://localhost:8081
-   ```
-
-### Email Templates
-
-1. Go to **Authentication** > **Email Templates**
-2. Review the **Confirm signup** template
-3. The confirmation link should use: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`
-
-### Rate Limits (Development)
-
-Supabase's default email service has rate limits:
-- Max 4 emails per hour to the same address
-- Max 30 emails per hour total
-
-**For testing, you can:**
-- Disable email confirmation temporarily (see above)
-- Use different email addresses
-- Wait between tests
-- Configure custom SMTP (see below)
-
-### Custom SMTP (Production)
-
-For production or heavy testing:
-
-1. Go to **Project Settings** > **Auth**
-2. Scroll to **SMTP Settings**
-3. Enable custom SMTP and configure with your email provider:
-   - Gmail, SendGrid, Mailgun, AWS SES, etc.
-   - This removes rate limits and improves deliverability
+1. In Supabase dashboard, go to **Authentication** > **Providers**
+2. **Email** provider should be enabled by default
+3. Optional: Configure email templates under **Authentication** > **Email Templates**
+4. Optional: For production, disable email confirmation under **Authentication** > **Settings** > **Email Auth**
 
 ## 5. Add Environment Variables
 
@@ -192,28 +144,5 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 - Verify all tables were created in the public schema
 
 ### Email not sending
-
-**Quick fix for development:**
-1. Go to **Authentication** > **Providers** > **Email**
-2. Turn OFF "Confirm email" setting
-3. This allows immediate login without email confirmation
-4. User will be created and can sign in right away
-
-**Check if user was created:**
-1. Go to **Authentication** > **Users** in Supabase
-2. If user exists but emails aren't sending:
-   - Check your spam folder
-   - You may have hit rate limits (max 4 emails/hour per address)
-   - Try a different email address
-   - Configure custom SMTP
-
-**Verify email manually (development workaround):**
-1. Go to **Authentication** > **Users**
-2. Find your user
-3. Click the user
-4. Manually confirm the email by clicking the "Confirm email" button
-
-**For production:**
-- Configure custom SMTP in **Project Settings** > **Auth**
-- Use SendGrid, Mailgun, or AWS SES for reliable email delivery
-- Set proper Site URL and Redirect URLs
+- For development, check **Authentication** > **Users** to see if user was created
+- For production, configure email provider in Supabase settings
