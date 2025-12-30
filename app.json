@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "FitPlan Buddy",
-    "slug": "fitplan-buddy-98rje1c",
+    "name": "Activo",
+    "slug": "activo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -22,7 +22,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.fitplan_buddy_98rje1c"
+      "package": "app.rork.activo"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

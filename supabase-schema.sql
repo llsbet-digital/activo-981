@@ -170,3 +170,72 @@ CREATE TRIGGER update_progress_metrics_updated_at
   BEFORE UPDATE ON progress_metrics
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
+-- Create schedule_preferences table
+CREATE TABLE IF NOT EXISTS schedule_preferences (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  preferred_time_slots JSONB NOT NULL DEFAULT '[]',
+  workout_durations JSONB NOT NULL DEFAULT '{}',
+  priority TEXT NOT NULL DEFAULT 'flexible' CHECK (priority IN ('must-do', 'flexible')),
+  days_per_week INTEGER NOT NULL DEFAULT 3,
+  calendar_integration JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id)
+);
+
+-- Create workout_suggestions table
+CREATE TABLE IF NOT EXISTS workout_suggestions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  suggested_date TEXT NOT NULL,
+  suggested_time TEXT NOT NULL,
+  duration INTEGER NOT NULL,
+  activity_type TEXT NOT NULL,
+  score NUMERIC NOT NULL DEFAULT 0,
+  reasoning TEXT,
+  accepted BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_schedule_preferences_user_id ON schedule_preferences(user_id);
+CREATE INDEX IF NOT EXISTS idx_workout_suggestions_user_id ON workout_suggestions(user_id);
+CREATE INDEX IF NOT EXISTS idx_workout_suggestions_user_date ON workout_suggestions(user_id, suggested_date);
+
+-- Enable RLS
+ALTER TABLE schedule_preferences ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workout_suggestions ENABLE ROW LEVEL SECURITY;
+
+-- RLS policies for schedule_preferences
+CREATE POLICY "Users can view their own schedule preferences"
+  ON schedule_preferences FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own schedule preferences"
+  ON schedule_preferences FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own schedule preferences"
+  ON schedule_preferences FOR UPDATE
+  USING (auth.uid() = user_id);
+
+-- RLS policies for workout_suggestions
+CREATE POLICY "Users can view their own workout suggestions"
+  ON workout_suggestions FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own workout suggestions"
+  ON workout_suggestions FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own workout suggestions"
+  ON workout_suggestions FOR UPDATE
+  USING (auth.uid() = user_id);
+
+-- Triggers
+CREATE TRIGGER update_schedule_preferences_updated_at
+  BEFORE UPDATE ON schedule_preferences
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();

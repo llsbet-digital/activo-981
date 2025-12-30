@@ -5,6 +5,7 @@ import { Activity, UserProfile, WeeklyStats } from '@/types/activity';
 import { startOfWeek, endOfWeek, isWithinInterval, parseISO } from 'date-fns';
 import { useAuth } from './AuthContext';
 import { profileService, activityService } from '@/lib/database';
+import { notificationService } from '@/lib/notification-service';
 
 const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: 'onboarding_completed',
@@ -80,6 +81,8 @@ export const [AppProvider, useApp] = createContextHook(() => {
     try {
       const created = await activityService.createActivity(user.id, activity);
       setActivities((prev) => [created, ...prev]);
+      
+      await notificationService.scheduleWorkoutReminder(created);
     } catch (error) {
       console.error('Error adding activity:', error);
       throw error;

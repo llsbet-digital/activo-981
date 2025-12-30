@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Activity, UserProfile, TrainingPlan, ProgressMetric } from '@/types/activity';
+import { Activity, UserProfile, TrainingPlan, ProgressMetric, SchedulePreference, WorkoutSuggestion } from '@/types/activity';
 
 export interface DbUserProfile extends Omit<UserProfile, 'preferredActivities'> {
   id: string;
@@ -440,6 +440,155 @@ export const progressMetricService = {
       if (error) throw error;
     } catch (error) {
       console.error('Error upserting progress metric:', error);
+      throw error;
+    }
+  },
+};
+
+export const schedulePreferenceService = {
+  async getSchedulePreference(userId: string): Promise<SchedulePreference | null> {
+    try {
+      const { data, error } = await supabase
+        .from('schedule_preferences')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return null;
+        throw error;
+      }
+
+      if (!data) return null;
+
+      return {
+        id: data.id,
+        userId: data.user_id,
+        preferredTimeSlots: data.preferred_time_slots,
+        workoutDurations: data.workout_durations,
+        priority: data.priority,
+        daysPerWeek: data.days_per_week,
+        calendarIntegration: data.calendar_integration,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      };
+    } catch (error) {
+      console.error('Error fetching schedule preference:', error);
+      throw error;
+    }
+  },
+
+  async upsertSchedulePreference(
+    userId: string,
+    preference: Omit<SchedulePreference, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
+  ): Promise<void> {
+    try {
+      const { error } = await supabase.from('schedule_preferences').upsert(
+        {
+          user_id: userId,
+          preferred_time_slots: preference.preferredTimeSlots,
+          workout_durations: preference.workoutDurations,
+          priority: preference.priority,
+          days_per_week: preference.daysPerWeek,
+          calendar_integration: preference.calendarIntegration,
+        },
+        {
+          onConflict: 'user_id',
+        }
+      );
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error upserting schedule preference:', error);
+      throw error;
+    }
+  },
+};
+
+export const workoutSuggestionService = {
+  async getWorkoutSuggestions(userId: string, limit = 10): Promise<WorkoutSuggestion[]> {
+    try {
+      const { data, error } = await supabase
+        .from('workout_suggestions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('score', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+
+      return (data || []).map((item) => ({
+        id: item.id,
+        userId: item.user_id,
+        suggestedDate: item.suggested_date,
+        suggestedTime: item.suggested_time,
+        duration: item.duration,
+        activityType: item.activity_type,
+        score: item.score,
+        reasoning: item.reasoning,
+        accepted: item.accepted,
+        createdAt: item.created_at,
+      }));
+    } catch (error) {
+      console.error('Error fetching workout suggestions:', error);
+      throw error;
+    }
+  },
+
+  async createWorkoutSuggestions(
+    userId: string,
+    suggestions: Omit<WorkoutSuggestion, 'id' | 'userId' | 'createdAt'>[]
+  ): Promise<void> {
+    try {
+      const { error } = await supabase.from('workout_suggestions').insert(
+        suggestions.map((s) => ({
+          user_id: userId,
+          suggested_date: s.suggestedDate,
+          suggested_time: s.suggestedTime,
+          duration: s.duration,
+          activity_type: s.activityType,
+          score: s.score,
+          reasoning: s.reasoning,
+          accepted: s.accepted,
+        }))
+      );
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error creating workout suggestions:', error);
+      throw error;
+    }
+  },
+
+  async updateWorkoutSuggestion(
+    userId: string,
+    suggestionId: string,
+    updates: { accepted: boolean }
+  ): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('workout_suggestions')
+        .update({ accepted: updates.accepted })
+        .eq('id', suggestionId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating workout suggestion:', error);
+      throw error;
+    }
+  },
+
+  async clearWorkoutSuggestions(userId: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('workout_suggestions')
+        .delete()
+        .eq('user_id', userId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error clearing workout suggestions:', error);
       throw error;
     }
   },
