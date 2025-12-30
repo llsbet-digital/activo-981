@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,11 +12,12 @@ import {
   Alert,
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
+import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { StatusBar } from 'expo-status-bar';
 
 export default function LoginScreen() {
-  const { signIn, signUp, resendConfirmationEmail } = useAuth();
+  const { signIn, signUp, resendConfirmationEmail, isAuthenticated, isLoading: authLoading } = useAuth();
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -24,6 +25,12 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showResendEmail, setShowResendEmail] = useState<boolean>(false);
   const [pendingEmail, setPendingEmail] = useState<string>('');
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.replace('/');
+    }
+  }, [isAuthenticated, authLoading]);
 
   const handleAuth = async () => {
     if (!email || !password) {
