@@ -45,7 +45,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         email,
         password,
         options: {
-          emailRedirectTo: 'myapp://auth/confirm',
+          emailRedirectTo: 'rork-app://auth/confirm',
         },
       });
       if (error) {
