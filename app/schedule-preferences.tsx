@@ -65,8 +65,9 @@ export default function SchedulePreferencesScreen() {
         setTimeSlots(prefs.preferredTimeSlots);
         setWorkoutDurations(prefs.workoutDurations);
       }
-    } catch (error) {
-      console.error('Error loading preferences:', error);
+    } catch (error: any) {
+      console.error('Error loading preferences:', error?.message || error);
+      console.error('Full error details:', JSON.stringify(error, null, 2));
     } finally {
       setIsLoading(false);
     }
@@ -125,9 +126,11 @@ export default function SchedulePreferencesScreen() {
 
       Alert.alert('Success', 'Schedule preferences saved successfully!');
       router.back();
-    } catch (error) {
-      console.error('Error saving preferences:', error);
-      Alert.alert('Error', 'Failed to save preferences. Please try again.');
+    } catch (error: any) {
+      console.error('Error saving preferences:', error?.message || error);
+      console.error('Full error details:', JSON.stringify(error, null, 2));
+      const errorMessage = error?.message || error?.error_description || 'Failed to save preferences. Please try again.';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsSaving(false);
     }

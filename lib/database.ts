@@ -505,8 +505,9 @@ export const schedulePreferenceService = {
       );
 
       if (error) throw error;
-    } catch (error) {
-      console.error('Error upserting schedule preference:', error);
+    } catch (error: any) {
+      console.error('Error upserting schedule preference:', error?.message || error);
+      console.error('Full error details:', JSON.stringify(error, null, 2));
       throw error;
     }
   },
