@@ -39,8 +39,9 @@ export const profileService = {
         preferredActivities: JSON.parse(data.preferred_activities),
         level: data.level,
       };
-    } catch (error) {
-      console.error('Error fetching profile:', error);
+    } catch (error: any) {
+      console.error('Error fetching profile:', error?.message || error);
+      console.error('Full error details:', JSON.stringify(error, null, 2));
       throw error;
     }
   },
@@ -57,8 +58,9 @@ export const profileService = {
       });
 
       if (error) throw error;
-    } catch (error) {
-      console.error('Error creating profile:', error);
+    } catch (error: any) {
+      console.error('Error creating profile:', error?.message || error);
+      console.error('Full error details:', JSON.stringify(error, null, 2));
       throw error;
     }
   },
@@ -81,8 +83,9 @@ export const profileService = {
         .eq('user_id', userId);
 
       if (error) throw error;
-    } catch (error) {
-      console.error('Error updating profile:', error);
+    } catch (error: any) {
+      console.error('Error updating profile:', error?.message || error);
+      console.error('Full error details:', JSON.stringify(error, null, 2));
       throw error;
     }
   },
@@ -111,8 +114,9 @@ export const activityService = {
         workoutLink: item.workout_link,
         completed: item.completed,
       }));
-    } catch (error) {
-      console.error('Error fetching activities:', error);
+    } catch (error: any) {
+      console.error('Error fetching activities:', error?.message || error);
+      console.error('Full error details:', JSON.stringify(error, null, 2));
       throw error;
     }
   },
@@ -150,8 +154,9 @@ export const activityService = {
         workoutLink: data.workout_link,
         completed: data.completed,
       };
-    } catch (error) {
-      console.error('Error creating activity:', error);
+    } catch (error: any) {
+      console.error('Error creating activity:', error?.message || error);
+      console.error('Full error details:', JSON.stringify(error, null, 2));
       throw error;
     }
   },
@@ -181,8 +186,9 @@ export const activityService = {
         .eq('user_id', userId);
 
       if (error) throw error;
-    } catch (error) {
-      console.error('Error updating activity:', error);
+    } catch (error: any) {
+      console.error('Error updating activity:', error?.message || error);
+      console.error('Full error details:', JSON.stringify(error, null, 2));
       throw error;
     }
   },
@@ -196,8 +202,9 @@ export const activityService = {
         .eq('user_id', userId);
 
       if (error) throw error;
-    } catch (error) {
-      console.error('Error deleting activity:', error);
+    } catch (error: any) {
+      console.error('Error deleting activity:', error?.message || error);
+      console.error('Full error details:', JSON.stringify(error, null, 2));
       throw error;
     }
   },

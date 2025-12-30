@@ -42,8 +42,9 @@ export const [AppProvider, useApp] = createContextHook(() => {
         setProfile(null);
         setActivities([]);
       }
-    } catch (error) {
-      console.error('Error loading data:', error);
+    } catch (error: any) {
+      console.error('Error loading data:', error?.message || String(error));
+      console.error('Full error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     } finally {
       setIsLoading(false);
     }
@@ -66,8 +67,9 @@ export const [AppProvider, useApp] = createContextHook(() => {
         await profileService.createProfile(user.id, newProfile);
       }
       setProfile(newProfile);
-    } catch (error) {
-      console.error('Error saving profile:', error);
+    } catch (error: any) {
+      console.error('Error saving profile:', error?.message || String(error));
+      console.error('Full error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
       throw error;
     }
   };
@@ -83,8 +85,9 @@ export const [AppProvider, useApp] = createContextHook(() => {
       setActivities((prev) => [created, ...prev]);
       
       await notificationService.scheduleWorkoutReminder(created);
-    } catch (error) {
-      console.error('Error adding activity:', error);
+    } catch (error: any) {
+      console.error('Error adding activity:', error?.message || String(error));
+      console.error('Full error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
       throw error;
     }
   };
@@ -100,8 +103,9 @@ export const [AppProvider, useApp] = createContextHook(() => {
       setActivities((prev) =>
         prev.map((a) => (a.id === activityId ? { ...a, ...updates } : a))
       );
-    } catch (error) {
-      console.error('Error updating activity:', error);
+    } catch (error: any) {
+      console.error('Error updating activity:', error?.message || String(error));
+      console.error('Full error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
       throw error;
     }
   };
@@ -115,8 +119,9 @@ export const [AppProvider, useApp] = createContextHook(() => {
     try {
       await activityService.deleteActivity(user.id, activityId);
       setActivities((prev) => prev.filter((a) => a.id !== activityId));
-    } catch (error) {
-      console.error('Error deleting activity:', error);
+    } catch (error: any) {
+      console.error('Error deleting activity:', error?.message || String(error));
+      console.error('Full error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
       throw error;
     }
   };
@@ -125,8 +130,9 @@ export const [AppProvider, useApp] = createContextHook(() => {
     try {
       setOnboardingCompleted(true);
       await AsyncStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, JSON.stringify(true));
-    } catch (error) {
-      console.error('Error completing onboarding:', error);
+    } catch (error: any) {
+      console.error('Error completing onboarding:', error?.message || String(error));
+      console.error('Full error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     }
   };
 
