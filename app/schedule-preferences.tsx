@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/constants/colors';
 import { useAuth } from '@/context/AuthContext';
+import { useApp } from '@/context/AppContext';
 import { schedulePreferenceService } from '@/lib/database';
 import { TimeSlot, ActivityType } from '@/types/activity';
 import { ChevronLeft, Plus, Trash2, Save } from 'lucide-react-native';
@@ -33,10 +34,11 @@ const ACTIVITY_TYPES: ActivityType[] = [
 
 export default function SchedulePreferencesScreen() {
   const { user } = useAuth();
+  const { profile } = useApp();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [daysPerWeek, setDaysPerWeek] = useState(3);
+  const [daysPerWeek, setDaysPerWeek] = useState(profile?.weeklyTarget || 3);
   const [priority, setPriority] = useState<'must-do' | 'flexible'>('flexible');
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [workoutDurations, setWorkoutDurations] = useState<Record<ActivityType, number>>({
@@ -298,7 +300,8 @@ export default function SchedulePreferencesScreen() {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Workout Durations (minutes)</Text>
-            {ACTIVITY_TYPES.map((activityType) => (
+            <Text style={styles.sectionSubtitle}>Set duration for your preferred activities</Text>
+            {(profile?.preferredActivities || ACTIVITY_TYPES).map((activityType) => (
               <View key={activityType} style={styles.durationRow}>
                 <Text style={styles.durationLabel}>
                   {activityType.charAt(0).toUpperCase() + activityType.slice(1)}
@@ -391,6 +394,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700' as const,
     color: colors.text,
+    marginBottom: 8,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: colors.textSecondary,
     marginBottom: 16,
   },
   daysSelector: {
