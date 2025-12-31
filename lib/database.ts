@@ -42,6 +42,10 @@ export const profileService = {
     } catch (error: any) {
       console.error('Error fetching profile:', error?.message || error);
       console.error('Full error details:', JSON.stringify(error, null, 2));
+      
+      if (error?.message?.includes('fetch')) {
+        throw new Error('Cannot connect to database. Please check your Supabase configuration and internet connection.');
+      }
       throw error;
     }
   },
@@ -117,6 +121,10 @@ export const activityService = {
     } catch (error: any) {
       console.error('Error fetching activities:', error?.message || error);
       console.error('Full error details:', JSON.stringify(error, null, 2));
+      
+      if (error?.message?.includes('fetch')) {
+        throw new Error('Cannot connect to database. Please check your Supabase configuration and internet connection.');
+      }
       throw error;
     }
   },
@@ -508,6 +516,10 @@ export const schedulePreferenceService = {
     } catch (error: any) {
       console.error('Error upserting schedule preference:', error?.message || error);
       console.error('Full error details:', JSON.stringify(error, null, 2));
+      
+      if (error?.message?.includes('fetch')) {
+        throw new Error('Cannot connect to database. Please check your Supabase configuration and internet connection.');
+      }
       throw error;
     }
   },

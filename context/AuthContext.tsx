@@ -35,7 +35,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         return {
           error: {
             name: 'ConfigError',
-            message: 'Supabase configuration is missing. Please check environment variables.',
+            message: 'Supabase is not configured. Please set up your environment variables in the project settings.',
             status: 0,
           } as unknown as AuthError
         };
@@ -59,10 +59,18 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       console.error('❌ Sign up exception:', error);
       console.error('Error type:', typeof error);
       console.error('Error keys:', Object.keys(error || {}));
+      
+      let errorMessage = 'Failed to connect to the server.';
+      if (error?.message?.includes('fetch')) {
+        errorMessage = 'Cannot connect to Supabase. Please check:\n1. Your internet connection\n2. Supabase environment variables are set\n3. Your Supabase project is active';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       return { 
         error: {
           name: error?.name || 'AuthError',
-          message: error?.message || 'Failed to connect to authentication service. Please check your internet connection and try again.',
+          message: errorMessage,
           status: error?.status || 0,
         } as unknown as AuthError
       };
@@ -85,6 +93,18 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   const signIn = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
     try {
       console.log('🔐 Attempting sign in...');
+      
+      if (!process.env.EXPO_PUBLIC_SUPABASE_URL || !process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY) {
+        console.error('❌ Environment variables not set!');
+        return {
+          error: {
+            name: 'ConfigError',
+            message: 'Supabase is not configured. Please set up your environment variables in the project settings.',
+            status: 0,
+          } as unknown as AuthError
+        };
+      }
+      
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -97,10 +117,18 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       return { error };
     } catch (error: any) {
       console.error('❌ Sign in exception:', error);
+      
+      let errorMessage = 'Failed to connect to the server.';
+      if (error?.message?.includes('fetch')) {
+        errorMessage = 'Cannot connect to Supabase. Please check:\n1. Your internet connection\n2. Supabase environment variables are set\n3. Your Supabase project is active';
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       return { 
         error: {
           name: error?.name || 'AuthError',
-          message: error?.message || 'Failed to connect to authentication service. Please check your internet connection and try again.',
+          message: errorMessage,
           status: error?.status || 0,
         } as unknown as AuthError
       };

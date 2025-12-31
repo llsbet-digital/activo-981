@@ -11,16 +11,28 @@ console.log('EXPO_PUBLIC_SUPABASE_URL:', supabaseUrl || '❌ NOT SET');
 console.log('EXPO_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✓ Set (length: ' + supabaseAnonKey.length + ')' : '❌ NOT SET');
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('❌ CRITICAL: Supabase environment variables missing!');
-  console.error('Please set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY');
-  console.error('Current values:');
-  console.error('  EXPO_PUBLIC_SUPABASE_URL:', supabaseUrl || 'MISSING');
-  console.error('  EXPO_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'SET' : 'MISSING');
+  const errorMsg = '\n\n' +
+    '═══════════════════════════════════════════════\n' +
+    '❌ SUPABASE CONFIGURATION ERROR\n' +
+    '═══════════════════════════════════════════════\n' +
+    'Environment variables are missing!\n\n' +
+    'Missing variables:\n' +
+    (!supabaseUrl ? '  • EXPO_PUBLIC_SUPABASE_URL\n' : '') +
+    (!supabaseAnonKey ? '  • EXPO_PUBLIC_SUPABASE_ANON_KEY\n' : '') +
+    '\n' +
+    'To fix this:\n' +
+    '1. Go to your Supabase project dashboard\n' +
+    '2. Copy your project URL and anon key\n' +
+    '3. Add them as environment variables in Rork\n' +
+    '═══════════════════════════════════════════════\n';
+  console.error(errorMsg);
+  throw new Error('Supabase environment variables not configured');
 }
 
-if (supabaseUrl && !supabaseUrl.startsWith('https://')) {
+if (!supabaseUrl.startsWith('https://')) {
   console.error('❌ CRITICAL: Supabase URL must start with https://');
   console.error('Current URL:', supabaseUrl);
+  throw new Error('Invalid Supabase URL format');
 }
 
 console.log('🔧 Initializing Supabase client...');
