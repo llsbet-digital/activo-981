@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Target, Activity, Settings, Award, Info, Calendar } from 'lucide-react-native';
+import { User, Target, Activity, Settings, Award, Info } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function ProfileScreen() {
@@ -110,22 +110,6 @@ export default function ProfileScreen() {
                 <Text style={styles.emptyText}>No preferred activities set</Text>
               )}
             </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Scheduling</Text>
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => router.push('/schedule-preferences')}
-            >
-              <View style={styles.actionIcon}>
-                <Calendar color={colors.primary} size={24} />
-              </View>
-              <View style={styles.actionInfo}>
-                <Text style={styles.actionTitle}>Schedule Preferences</Text>
-                <Text style={styles.actionSubtitle}>Configure workout times & frequency</Text>
-              </View>
-            </TouchableOpacity>
           </View>
 
           <View style={styles.section}>

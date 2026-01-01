@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import { WorkoutSuggestion, Activity } from '@/types/activity';
+import { Activity } from '@/types/activity';
 import { parseISO, subHours } from 'date-fns';
 
 Notifications.setNotificationHandler({
@@ -57,53 +57,6 @@ export class NotificationService {
           title: 'Workout Reminder 🏋️',
           body: `${activity.title} starts in 1 hour! Get ready to crush it!`,
           data: { activityId: activity.id, type: 'workout_reminder' },
-        },
-        trigger: { 
-          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-          seconds: Math.floor((reminderDate.getTime() - Date.now()) / 1000) 
-        },
-      });
-
-      console.log('Scheduled notification:', notificationId);
-      return notificationId;
-    } catch (error) {
-      console.error('Error scheduling notification:', error);
-      return null;
-    }
-  }
-
-  async scheduleSuggestionReminder(
-    suggestion: WorkoutSuggestion,
-    hoursBeforeWorkout = 1
-  ): Promise<string | null> {
-    if (Platform.OS === 'web') {
-      console.log('Notifications not supported on web');
-      return null;
-    }
-
-    try {
-      const hasPermission = await this.requestPermissions();
-      if (!hasPermission) {
-        console.log('Notification permission not granted');
-        return null;
-      }
-
-      const workoutDateTime = parseISO(`${suggestion.suggestedDate}T${suggestion.suggestedTime}:00`);
-      const reminderDate = subHours(workoutDateTime, hoursBeforeWorkout);
-
-      const now = new Date();
-      if (reminderDate <= now) {
-        console.log('Reminder date is in the past, skipping notification');
-        return null;
-      }
-
-      const activityTitle = `${suggestion.activityType.charAt(0).toUpperCase() + suggestion.activityType.slice(1)} Workout`;
-
-      const notificationId = await Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Scheduled Workout 💪',
-          body: `${activityTitle} starts in ${hoursBeforeWorkout} hour${hoursBeforeWorkout > 1 ? 's' : ''}! Time to get moving!`,
-          data: { suggestionId: suggestion.id, type: 'suggestion_reminder' },
         },
         trigger: { 
           type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,

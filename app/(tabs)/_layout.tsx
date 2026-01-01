@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Home, Calendar, TrendingUp, User, Sparkles } from "lucide-react-native";
+import { Home, Calendar, TrendingUp, User } from "lucide-react-native";
 import React from "react";
 import { colors } from "@/constants/colors";
 
