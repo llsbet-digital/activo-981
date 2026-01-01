@@ -109,10 +109,6 @@ export default function ProgressScreen() {
                 <Text style={styles.weekStatLabel}>Distance</Text>
                 <Text style={styles.weekStatValue}>{weeklyStats.totalDistance.toFixed(1)} km</Text>
               </View>
-              <View style={styles.weekStatRow}>
-                <Text style={styles.weekStatLabel}>Calories Burned</Text>
-                <Text style={styles.weekStatValue}>{weeklyStats.totalCalories}</Text>
-              </View>
             </View>
           </View>
 
