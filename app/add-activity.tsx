@@ -38,7 +38,6 @@ export default function AddActivityScreen() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [duration, setDuration] = useState<string>('30');
   const [distance, setDistance] = useState<string>('5');
-  const [calories, setCalories] = useState<string>('250');
   const [notes, setNotes] = useState<string>('');
   const [workoutLink, setWorkoutLink] = useState<string>('');
 
@@ -67,7 +66,6 @@ export default function AddActivityScreen() {
       date: selectedDate.toISOString(),
       duration: parseInt(duration) || 0,
       distance: showDistanceField ? (parseFloat(distance) || undefined) : undefined,
-      calories: parseInt(calories) || undefined,
       notes: notes.trim() || undefined,
       workoutLink: workoutLink.trim() || undefined,
       completed: false,
@@ -183,18 +181,6 @@ export default function AddActivityScreen() {
                 />
               </View>
             )}
-
-            <View style={styles.section}>
-              <Text style={styles.label}>Calories</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="250"
-                placeholderTextColor={colors.textMuted}
-                value={calories}
-                onChangeText={setCalories}
-                keyboardType="numeric"
-              />
-            </View>
 
             <View style={styles.section}>
               <Text style={styles.label}>Workout Link (optional)</Text>
