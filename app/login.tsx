@@ -10,6 +10,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Image,
 } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
@@ -108,6 +109,11 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
+          <Image
+            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/uybx2idxq0n86iggr158d' }}
+            style={styles.image}
+            resizeMode="contain"
+          />
           <Text style={styles.title}>
             {isSignUp ? 'Create Account' : 'Welcome Back'}
           </Text>
@@ -227,23 +233,35 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     padding: 24,
   },
   header: {
     marginBottom: 40,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 400,
+  },
+  image: {
+    width: 120,
+    height: 120,
+    marginBottom: 32,
   },
   title: {
     fontSize: 32,
     fontWeight: '700' as const,
     color: colors.text,
     marginBottom: 8,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: colors.textSecondary,
+    textAlign: 'center',
   },
   form: {
     width: '100%',
+    maxWidth: 400,
   },
   inputContainer: {
     marginBottom: 20,
