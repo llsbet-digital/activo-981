@@ -10,6 +10,16 @@ console.log('🔧 Checking Supabase configuration...');
 console.log('EXPO_PUBLIC_SUPABASE_URL:', supabaseUrl || '❌ NOT SET');
 console.log('EXPO_PUBLIC_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✓ Set (length: ' + supabaseAnonKey.length + ')' : '❌ NOT SET');
 
+if (supabaseUrl) {
+  try {
+    const url = new URL(supabaseUrl);
+    console.log('URL hostname:', url.hostname);
+    console.log('URL protocol:', url.protocol);
+  } catch (e) {
+    console.error('Invalid URL format:', e);
+  }
+}
+
 if (!supabaseUrl || !supabaseAnonKey) {
   const errorMsg = '\n\n' +
     '═══════════════════════════════════════════════\n' +

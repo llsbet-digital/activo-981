@@ -43,8 +43,15 @@ export const profileService = {
       console.error('Error fetching profile:', error?.message || error);
       console.error('Full error details:', JSON.stringify(error, null, 2));
       
-      if (error?.message?.includes('fetch')) {
-        throw new Error('Cannot connect to database. Please check your Supabase configuration and internet connection.');
+      if (error?.message?.includes('fetch') || error?.name === 'TypeError') {
+        const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+        const hasKey = !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+        throw new Error(
+          `Database connection failed. ` +
+          `URL: ${supabaseUrl ? 'set' : 'missing'}, ` +
+          `Key: ${hasKey ? 'set' : 'missing'}. ` +
+          `Please verify your Supabase credentials in environment variables.`
+        );
       }
       throw error;
     }
@@ -122,8 +129,15 @@ export const activityService = {
       console.error('Error fetching activities:', error?.message || error);
       console.error('Full error details:', JSON.stringify(error, null, 2));
       
-      if (error?.message?.includes('fetch')) {
-        throw new Error('Cannot connect to database. Please check your Supabase configuration and internet connection.');
+      if (error?.message?.includes('fetch') || error?.name === 'TypeError') {
+        const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+        const hasKey = !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+        throw new Error(
+          `Database connection failed. ` +
+          `URL: ${supabaseUrl ? 'set' : 'missing'}, ` +
+          `Key: ${hasKey ? 'set' : 'missing'}. ` +
+          `Please verify your Supabase credentials in environment variables.`
+        );
       }
       throw error;
     }
