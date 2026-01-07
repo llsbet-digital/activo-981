@@ -4,7 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
-import { Target, X } from 'lucide-react-native';
+import { Target, X, Clock, MapPin, Flame, Calendar, Link as LinkIcon, Dumbbell } from 'lucide-react-native';
 import { format, parseISO, isToday, startOfWeek, addDays, isSameDay } from 'date-fns';
 import { Activity } from '@/types/activity';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -225,65 +225,90 @@ export default function HomeScreen() {
 
             {selectedActivity && (
               <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
-                <View style={styles.modalSection}>
-                  <Text style={styles.modalLabel}>Title</Text>
-                  <Text style={styles.modalValue}>{selectedActivity.title}</Text>
-                </View>
-
-                <View style={styles.modalSection}>
-                  <Text style={styles.modalLabel}>Type</Text>
-                  <Text style={styles.modalValue}>{selectedActivity.type}</Text>
-                </View>
-
-                <View style={styles.modalSection}>
-                  <Text style={styles.modalLabel}>Date</Text>
-                  <Text style={styles.modalValue}>
-                    {format(parseISO(selectedActivity.date), 'EEEE, MMMM d, yyyy')}
-                  </Text>
-                </View>
-
-                <View style={styles.modalSection}>
-                  <Text style={styles.modalLabel}>Duration</Text>
-                  <Text style={styles.modalValue}>{selectedActivity.duration} minutes</Text>
-                </View>
-
-                {selectedActivity.distance !== undefined && selectedActivity.distance > 0 && (
-                  <View style={styles.modalSection}>
-                    <Text style={styles.modalLabel}>Distance</Text>
-                    <Text style={styles.modalValue}>{selectedActivity.distance} km</Text>
+                <View style={styles.modalInfoCard}>
+                  <View style={styles.modalIconContainer}>
+                    <Dumbbell color={colors.primary} size={24} />
                   </View>
-                )}
+                  <View style={styles.modalInfoContent}>
+                    <Text style={styles.modalInfoLabel}>Workout</Text>
+                    <Text style={styles.modalInfoValue}>{selectedActivity.title}</Text>
+                    <Text style={styles.modalInfoSubtitle}>{selectedActivity.type}</Text>
+                  </View>
+                </View>
 
-                {selectedActivity.calories !== undefined && selectedActivity.calories > 0 && (
-                  <View style={styles.modalSection}>
-                    <Text style={styles.modalLabel}>Calories</Text>
-                    <Text style={styles.modalValue}>{selectedActivity.calories} kcal</Text>
+                <View style={styles.modalInfoCard}>
+                  <View style={styles.modalIconContainer}>
+                    <Calendar color={colors.warning} size={24} />
+                  </View>
+                  <View style={styles.modalInfoContent}>
+                    <Text style={styles.modalInfoLabel}>Date</Text>
+                    <Text style={styles.modalInfoValue}>
+                      {format(parseISO(selectedActivity.date), 'EEEE, MMM d, yyyy')}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.modalMetricsRow}>
+                  <View style={styles.modalMetricCard}>
+                    <View style={styles.modalMetricIcon}>
+                      <Clock color={colors.primary} size={20} />
+                    </View>
+                    <Text style={styles.modalMetricLabel}>Duration</Text>
+                    <Text style={styles.modalMetricValue}>{selectedActivity.duration}</Text>
+                    <Text style={styles.modalMetricUnit}>minutes</Text>
+                  </View>
+
+                  {selectedActivity.distance !== undefined && selectedActivity.distance > 0 && (
+                    <View style={styles.modalMetricCard}>
+                      <View style={styles.modalMetricIcon}>
+                        <MapPin color={colors.success} size={20} />
+                      </View>
+                      <Text style={styles.modalMetricLabel}>Distance</Text>
+                      <Text style={styles.modalMetricValue}>{selectedActivity.distance}</Text>
+                      <Text style={styles.modalMetricUnit}>km</Text>
+                    </View>
+                  )}
+
+                  {selectedActivity.calories !== undefined && selectedActivity.calories > 0 && (
+                    <View style={styles.modalMetricCard}>
+                      <View style={styles.modalMetricIcon}>
+                        <Flame color={colors.warning} size={20} />
+                      </View>
+                      <Text style={styles.modalMetricLabel}>Calories</Text>
+                      <Text style={styles.modalMetricValue}>{selectedActivity.calories}</Text>
+                      <Text style={styles.modalMetricUnit}>kcal</Text>
+                    </View>
+                  )}
+                </View>
+
+                {selectedActivity.workoutLink && (
+                  <View style={styles.modalInfoCard}>
+                    <View style={styles.modalIconContainer}>
+                      <LinkIcon color={colors.primary} size={24} />
+                    </View>
+                    <View style={styles.modalInfoContent}>
+                      <Text style={styles.modalInfoLabel}>Workout Link</Text>
+                      <Text style={[styles.modalInfoValue, styles.linkText]} numberOfLines={2}>
+                        {selectedActivity.workoutLink}
+                      </Text>
+                    </View>
                   </View>
                 )}
 
                 {selectedActivity.notes && (
-                  <View style={styles.modalSection}>
-                    <Text style={styles.modalLabel}>Notes</Text>
-                    <Text style={styles.modalValue}>{selectedActivity.notes}</Text>
+                  <View style={styles.modalNotesCard}>
+                    <Text style={styles.modalNotesLabel}>Notes</Text>
+                    <Text style={styles.modalNotesValue}>{selectedActivity.notes}</Text>
                   </View>
                 )}
 
-                {selectedActivity.workoutLink && (
-                  <View style={styles.modalSection}>
-                    <Text style={styles.modalLabel}>Workout Link</Text>
-                    <Text style={[styles.modalValue, styles.linkText]}>
-                      {selectedActivity.workoutLink}
-                    </Text>
-                  </View>
-                )}
-
-                <View style={styles.modalSection}>
-                  <Text style={styles.modalLabel}>Status</Text>
-                  <View style={styles.statusBadge}>
-                    <Text style={styles.statusText}>
-                      {selectedActivity.completed ? '✓ Completed' : '⏳ Pending'}
-                    </Text>
-                  </View>
+                <View style={[
+                  styles.modalStatusCard,
+                  selectedActivity.completed ? styles.modalStatusCardCompleted : styles.modalStatusCardPending
+                ]}>
+                  <Text style={styles.modalStatusText}>
+                    {selectedActivity.completed ? '✓ Completed' : '⏳ Scheduled'}
+                  </Text>
                 </View>
               </ScrollView>
             )}
@@ -581,40 +606,139 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalBody: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingHorizontal: 20,
+    paddingTop: 20,
     paddingBottom: 32,
   },
-  modalSection: {
-    marginBottom: 24,
+  modalInfoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.backgroundCard,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  modalLabel: {
+  modalIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.backgroundLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  modalInfoContent: {
+    flex: 1,
+  },
+  modalInfoLabel: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    color: colors.textSecondary,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  modalInfoValue: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: colors.text,
+    marginBottom: 2,
+  },
+  modalInfoSubtitle: {
     fontSize: 14,
+    color: colors.textSecondary,
+  },
+  modalMetricsRow: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    gap: 12,
+  },
+  modalMetricCard: {
+    flex: 1,
+    backgroundColor: colors.backgroundCard,
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  modalMetricIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.backgroundLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  modalMetricLabel: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    color: colors.textSecondary,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  modalMetricValue: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    color: colors.text,
+  },
+  modalMetricUnit: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  modalNotesCard: {
+    backgroundColor: colors.backgroundCard,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  modalNotesLabel: {
+    fontSize: 12,
     fontWeight: '600' as const,
     color: colors.textSecondary,
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  modalValue: {
-    fontSize: 16,
+  modalNotesValue: {
+    fontSize: 15,
     color: colors.text,
-    lineHeight: 24,
+    lineHeight: 22,
+  },
+  modalStatusCard: {
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  modalStatusCardCompleted: {
+    backgroundColor: colors.paleGreen,
+  },
+  modalStatusCardPending: {
+    backgroundColor: colors.paleBlue,
+  },
+  modalStatusText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: colors.text,
   },
   linkText: {
     color: colors.primary,
-    textDecorationLine: 'underline',
-  },
-  statusBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: colors.backgroundLight,
-  },
-  statusText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: colors.text,
   },
 });
