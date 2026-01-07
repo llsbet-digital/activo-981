@@ -40,17 +40,32 @@ export const profileService = {
         level: data.level,
       };
     } catch (error: any) {
-      console.error('Error fetching profile:', error?.message || error);
+      console.error('❌ Error fetching profile:', error?.message || error);
       console.error('Full error details:', JSON.stringify(error, null, 2));
       
-      if (error?.message?.includes('fetch') || error?.name === 'TypeError') {
+      if (error?.message?.includes('fetch') || error?.name === 'TypeError' || error?.message?.includes('NetworkError')) {
         const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
         const hasKey = !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+        
+        console.error('\n🔴 DATABASE CONNECTION ERROR');
+        console.error('Supabase URL:', supabaseUrl || 'NOT SET');
+        console.error('Supabase Key:', hasKey ? 'SET' : 'NOT SET');
+        console.error('\nPossible causes:');
+        console.error('1. Incorrect Supabase URL or API key');
+        console.error('2. Supabase project is paused or deleted');
+        console.error('3. Network connectivity issues');
+        console.error('4. CORS configuration (web only)');
+        console.error('\nTroubleshooting:');
+        console.error('- Check your Supabase dashboard: https://app.supabase.com');
+        console.error('- Verify your project is active');
+        console.error('- Ensure environment variables are correct');
+        console.error('- Try restarting the app\n');
+        
         throw new Error(
-          `Database connection failed. ` +
-          `URL: ${supabaseUrl ? 'set' : 'missing'}, ` +
-          `Key: ${hasKey ? 'set' : 'missing'}. ` +
-          `Please verify your Supabase credentials in environment variables.`
+          `Cannot connect to Supabase. ` +
+          `${!supabaseUrl ? 'URL is missing. ' : ''}` +
+          `${!hasKey ? 'API key is missing. ' : ''}` +
+          `Please check your environment variables and Supabase project status.`
         );
       }
       throw error;
@@ -126,17 +141,18 @@ export const activityService = {
         completed: item.completed,
       }));
     } catch (error: any) {
-      console.error('Error fetching activities:', error?.message || error);
+      console.error('❌ Error fetching activities:', error?.message || error);
       console.error('Full error details:', JSON.stringify(error, null, 2));
       
-      if (error?.message?.includes('fetch') || error?.name === 'TypeError') {
+      if (error?.message?.includes('fetch') || error?.name === 'TypeError' || error?.message?.includes('NetworkError')) {
         const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
         const hasKey = !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+        
         throw new Error(
-          `Database connection failed. ` +
-          `URL: ${supabaseUrl ? 'set' : 'missing'}, ` +
-          `Key: ${hasKey ? 'set' : 'missing'}. ` +
-          `Please verify your Supabase credentials in environment variables.`
+          `Cannot connect to Supabase. ` +
+          `${!supabaseUrl ? 'URL is missing. ' : ''}` +
+          `${!hasKey ? 'API key is missing. ' : ''}` +
+          `Please check your environment variables and Supabase project status.`
         );
       }
       throw error;

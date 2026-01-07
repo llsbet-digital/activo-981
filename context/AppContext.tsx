@@ -43,8 +43,14 @@ export const [AppProvider, useApp] = createContextHook(() => {
         setActivities([]);
       }
     } catch (error: any) {
-      console.error('Error loading data:', error?.message || String(error));
+      console.error('\n❌ ERROR LOADING APP DATA');
+      console.error('Error message:', error?.message || String(error));
       console.error('Full error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      console.error('\n💡 If you see connection errors:');
+      console.error('1. Check that your Supabase project is active');
+      console.error('2. Verify environment variables are set correctly');
+      console.error('3. Make sure you have internet connection');
+      console.error('4. Try restarting the development server\n');
     } finally {
       setIsLoading(false);
     }
