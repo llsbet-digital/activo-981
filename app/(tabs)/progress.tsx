@@ -2,9 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { useApp } from '@/context/AppContext';
 import { colors } from '@/constants/colors';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { TrendingUp, Award, Flame } from 'lucide-react-native';
+import { Award } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -63,30 +62,18 @@ export default function ProgressScreen() {
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           <View style={styles.statsGrid}>
-            <View style={styles.statCardLarge}>
-              <LinearGradient
-                colors={[colors.primary, colors.primaryLight]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.statGradient}
-              >
-                <TrendingUp color={colors.text} size={32} />
+            <View style={[styles.statCardLarge, { backgroundColor: colors.paleBlue }]}>
+              <View style={styles.statContent}>
                 <Text style={styles.statValueLarge}>{completedActivities.length}</Text>
                 <Text style={styles.statLabelLarge}>Total Workouts</Text>
-              </LinearGradient>
+              </View>
             </View>
 
-            <View style={styles.statCardLarge}>
-              <LinearGradient
-                colors={[colors.success, colors.successLight]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.statGradient}
-              >
-                <Flame color={colors.text} size={32} />
+            <View style={[styles.statCardLarge, { backgroundColor: colors.paleGreen }]}>
+              <View style={styles.statContent}>
                 <Text style={styles.statValueLarge}>{Math.round(completionRate)}%</Text>
                 <Text style={styles.statLabelLarge}>Completion Rate</Text>
-              </LinearGradient>
+              </View>
             </View>
           </View>
 
@@ -193,7 +180,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
   },
-  statGradient: {
+  statContent: {
     padding: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -208,7 +195,7 @@ const styles = StyleSheet.create({
   },
   statLabelLarge: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   section: {

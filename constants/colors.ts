@@ -15,12 +15,15 @@ export const colors = {
   backgroundCard: '#FFFFFF',
   backgroundLight: '#FAFBFC',
   
-  text: '#1C1C1E',
+  text: '#353535',
   textSecondary: '#6C6C70',
   textMuted: '#AEAEB2',
   
   border: '#E5E5EA',
   borderLight: '#F2F2F7',
+  
+  paleBlue: '#E3F2FD',
+  paleGreen: '#E8F5E9',
   
   overlay: 'rgba(0, 0, 0, 0.3)',
   shadow: 'rgba(0, 0, 0, 0.08)',
