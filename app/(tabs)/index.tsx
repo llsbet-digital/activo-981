@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Animated, Dimensions, Easing } from 'react-native';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
-import { Target } from 'lucide-react-native';
+import { Target, X } from 'lucide-react-native';
 import { format, parseISO, isToday, startOfWeek, addDays, isSameDay } from 'date-fns';
+import { Activity } from '@/types/activity';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { profile, activities, weeklyStats, onboardingCompleted, isLoading } = useApp();
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current;
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -33,6 +37,29 @@ export default function HomeScreen() {
   const selectedDayActivities = activities.filter(
     (a) => !a.completed && isSameDay(parseISO(a.date), selectedDay)
   );
+
+  const openWorkoutModal = (activity: Activity) => {
+    setSelectedActivity(activity);
+    setModalVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 500,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeWorkoutModal = () => {
+    Animated.timing(slideAnim, {
+      toValue: Dimensions.get('window').height,
+      duration: 500,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
+    }).start(() => {
+      setModalVisible(false);
+      setSelectedActivity(null);
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -106,7 +133,11 @@ export default function HomeScreen() {
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Today&apos;s Activities</Text>
               {todayActivities.map((activity) => (
-                <View key={activity.id} style={styles.activityCard}>
+                <TouchableOpacity 
+                  key={activity.id} 
+                  style={styles.activityCard}
+                  onPress={() => openWorkoutModal(activity)}
+                >
                   <View style={styles.activityIcon}>
                     <Text style={styles.activityEmoji}>🏃</Text>
                   </View>
@@ -121,7 +152,7 @@ export default function HomeScreen() {
                       <Text style={styles.completedText}>✓</Text>
                     </View>
                   )}
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           )}
@@ -133,9 +164,7 @@ export default function HomeScreen() {
                 <TouchableOpacity 
                   key={activity.id} 
                   style={styles.activityCard}
-                  onPress={() => {
-                    console.log('Activity clicked:', activity.id);
-                  }}
+                  onPress={() => openWorkoutModal(activity)}
                 >
                   <View style={styles.activityIcon}>
                     <Text style={styles.activityEmoji}>📅</Text>
@@ -166,6 +195,101 @@ export default function HomeScreen() {
           )}
         </ScrollView>
       </SafeAreaView>
+
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="none"
+        onRequestClose={closeWorkoutModal}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity 
+            style={styles.modalBackdrop} 
+            activeOpacity={1}
+            onPress={closeWorkoutModal}
+          />
+          <Animated.View 
+            style={[
+              styles.modalContent,
+              {
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Workout Details</Text>
+              <TouchableOpacity onPress={closeWorkoutModal} style={styles.closeButton}>
+                <X color={colors.text} size={24} />
+              </TouchableOpacity>
+            </View>
+
+            {selectedActivity && (
+              <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalLabel}>Title</Text>
+                  <Text style={styles.modalValue}>{selectedActivity.title}</Text>
+                </View>
+
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalLabel}>Type</Text>
+                  <Text style={styles.modalValue}>{selectedActivity.type}</Text>
+                </View>
+
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalLabel}>Date</Text>
+                  <Text style={styles.modalValue}>
+                    {format(parseISO(selectedActivity.date), 'EEEE, MMMM d, yyyy')}
+                  </Text>
+                </View>
+
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalLabel}>Duration</Text>
+                  <Text style={styles.modalValue}>{selectedActivity.duration} minutes</Text>
+                </View>
+
+                {selectedActivity.distance !== undefined && selectedActivity.distance > 0 && (
+                  <View style={styles.modalSection}>
+                    <Text style={styles.modalLabel}>Distance</Text>
+                    <Text style={styles.modalValue}>{selectedActivity.distance} km</Text>
+                  </View>
+                )}
+
+                {selectedActivity.calories !== undefined && selectedActivity.calories > 0 && (
+                  <View style={styles.modalSection}>
+                    <Text style={styles.modalLabel}>Calories</Text>
+                    <Text style={styles.modalValue}>{selectedActivity.calories} kcal</Text>
+                  </View>
+                )}
+
+                {selectedActivity.notes && (
+                  <View style={styles.modalSection}>
+                    <Text style={styles.modalLabel}>Notes</Text>
+                    <Text style={styles.modalValue}>{selectedActivity.notes}</Text>
+                  </View>
+                )}
+
+                {selectedActivity.workoutLink && (
+                  <View style={styles.modalSection}>
+                    <Text style={styles.modalLabel}>Workout Link</Text>
+                    <Text style={[styles.modalValue, styles.linkText]}>
+                      {selectedActivity.workoutLink}
+                    </Text>
+                  </View>
+                )}
+
+                <View style={styles.modalSection}>
+                  <Text style={styles.modalLabel}>Status</Text>
+                  <View style={styles.statusBadge}>
+                    <Text style={styles.statusText}>
+                      {selectedActivity.completed ? '✓ Completed' : '⏳ Pending'}
+                    </Text>
+                  </View>
+                </View>
+              </ScrollView>
+            )}
+          </Animated.View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -410,5 +534,87 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600' as const,
   },
-
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  modalContent: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '80%',
+    paddingTop: 24,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+    color: colors.text,
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.backgroundLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBody: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 32,
+  },
+  modalSection: {
+    marginBottom: 24,
+  },
+  modalLabel: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: colors.textSecondary,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  modalValue: {
+    fontSize: 16,
+    color: colors.text,
+    lineHeight: 24,
+  },
+  linkText: {
+    color: colors.primary,
+    textDecorationLine: 'underline',
+  },
+  statusBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: colors.backgroundLight,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: colors.text,
+  },
 });
