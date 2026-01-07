@@ -1,16 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
-import { Plus, Target } from 'lucide-react-native';
+import { Target } from 'lucide-react-native';
 import { format, parseISO, isToday, startOfWeek, addDays, isSameDay } from 'date-fns';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { profile, activities, weeklyStats, onboardingCompleted, isLoading } = useApp();
+  const [selectedDay, setSelectedDay] = useState<Date>(new Date());
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -29,9 +30,9 @@ export default function HomeScreen() {
   }
 
   const todayActivities = activities.filter((a) => isToday(parseISO(a.date)));
-  const upcomingActivities = activities.filter(
-    (a) => !a.completed && parseISO(a.date) >= new Date()
-  ).slice(0, 3);
+  const selectedDayActivities = activities.filter(
+    (a) => !a.completed && isSameDay(parseISO(a.date), selectedDay)
+  );
 
   return (
     <View style={styles.container}>
@@ -61,25 +62,28 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.weekOverviewContainer}>
-            <Text style={styles.weekOverviewTitle}>This Week</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.weekScroll}>
               {Array.from({ length: 7 }).map((_, index) => {
                 const day = addDays(startOfWeek(new Date(), { weekStartsOn: 0 }), index);
-                const isCurrentDay = isSameDay(day, new Date());
+                const isSelected = isSameDay(day, selectedDay);
                 const hasActivity = activities.some(a => isSameDay(parseISO(a.date), day) && a.completed);
                 
                 return (
-                  <View key={index} style={[styles.dayCard, isCurrentDay && styles.dayCardActive]}>
-                    <Text style={[styles.dayName, isCurrentDay && styles.dayNameActive]}>
+                  <TouchableOpacity 
+                    key={index} 
+                    style={[styles.dayCard, isSelected && styles.dayCardSelected]}
+                    onPress={() => setSelectedDay(day)}
+                  >
+                    <Text style={[styles.dayName, isSelected && styles.dayNameSelected]}>
                       {format(day, 'EEE')}
                     </Text>
-                    <Text style={[styles.dayNumber, isCurrentDay && styles.dayNumberActive]}>
+                    <Text style={[styles.dayNumber, isSelected && styles.dayNumberSelected]}>
                       {format(day, 'dd')}
                     </Text>
                     {hasActivity && (
                       <View style={styles.activityDot} />
                     )}
-                  </View>
+                  </TouchableOpacity>
                 );
               })}
             </ScrollView>
@@ -109,40 +113,45 @@ export default function HomeScreen() {
             </View>
           )}
 
-          {upcomingActivities.length > 0 && (
+          {selectedDayActivities.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Upcoming Workouts</Text>
-              {upcomingActivities.map((activity) => (
-                <View key={activity.id} style={styles.activityCard}>
+              {selectedDayActivities.map((activity) => (
+                <TouchableOpacity 
+                  key={activity.id} 
+                  style={styles.activityCard}
+                  onPress={() => {
+                    console.log('Activity clicked:', activity.id);
+                  }}
+                >
                   <View style={styles.activityIcon}>
                     <Text style={styles.activityEmoji}>📅</Text>
                   </View>
                   <View style={styles.activityInfo}>
                     <Text style={styles.activityTitle}>{activity.title}</Text>
                     <Text style={styles.activityTime}>
-                      {format(parseISO(activity.date), 'MMM d, h:mm a')}
+                      {activity.duration} min • {activity.distance || 0} km
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           )}
 
-          {upcomingActivities.length === 0 && todayActivities.length === 0 && (
+          {selectedDayActivities.length === 0 && (
             <View style={styles.emptyState}>
               <Text style={styles.emptyEmoji}>🎯</Text>
-              <Text style={styles.emptyTitle}>No activities scheduled</Text>
-              <Text style={styles.emptyText}>Tap the + button to add your first workout!</Text>
+              <Text style={styles.emptyTitle}>No workouts scheduled</Text>
+              <Text style={styles.emptyText}>Add your first workout for this day!</Text>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => router.push('/add-activity' as any)}
+              >
+                <Text style={styles.addButtonText}>Add Workout</Text>
+              </TouchableOpacity>
             </View>
           )}
         </ScrollView>
-
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={() => router.push('/add-activity' as any)}
-        >
-          <Plus color="#FFFFFF" size={28} />
-        </TouchableOpacity>
       </SafeAreaView>
     </View>
   );
@@ -256,6 +265,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderColor: colors.primary,
   },
+  dayCardSelected: {
+    backgroundColor: '#E3F2FD',
+    borderColor: '#90CAF9',
+  },
   dayName: {
     fontSize: 12,
     color: colors.textSecondary,
@@ -265,6 +278,9 @@ const styles = StyleSheet.create({
   dayNameActive: {
     color: '#FFFFFF',
   },
+  dayNameSelected: {
+    color: '#1976D2',
+  },
   dayNumber: {
     fontSize: 18,
     fontWeight: '700' as const,
@@ -272,6 +288,9 @@ const styles = StyleSheet.create({
   },
   dayNumberActive: {
     color: '#FFFFFF',
+  },
+  dayNumberSelected: {
+    color: '#1976D2',
   },
   activityDot: {
     width: 4,
@@ -360,21 +379,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.textSecondary,
     textAlign: 'center',
+    marginBottom: 24,
   },
-  fab: {
-    position: 'absolute',
-    bottom: 80,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  addButton: {
     backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 12,
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowRadius: 4,
+    elevation: 3,
   },
+  addButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+
 });

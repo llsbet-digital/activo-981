@@ -1,7 +1,8 @@
-import { Tabs } from "expo-router";
-import { Home, Calendar, TrendingUp, User } from "lucide-react-native";
+import { Tabs, router } from "expo-router";
+import { Home, Calendar, TrendingUp, User, Plus } from "lucide-react-native";
 import React from "react";
 import { colors } from "@/constants/colors";
+import { TouchableOpacity, View, StyleSheet } from "react-native";
 
 export default function TabLayout() {
   return (
@@ -29,6 +30,23 @@ export default function TabLayout() {
         },
       }}
     >
+      <Tabs.Screen
+        name="add-workout"
+        options={{
+          title: '',
+          tabBarIcon: () => null,
+          tabBarButton: () => (
+            <View style={styles.fabContainer}>
+              <TouchableOpacity 
+                style={styles.fabButton}
+                onPress={() => router.push('/add-activity' as any)}
+              >
+                <Plus color="#FFFFFF" size={24} />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+      />
       <Tabs.Screen
         name="index"
         options={{
@@ -61,3 +79,25 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  fabContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fabButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: -30,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+});
