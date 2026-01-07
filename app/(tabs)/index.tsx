@@ -4,8 +4,8 @@ import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
-import { Plus, Flame, Target, Timer, TrendingUp } from 'lucide-react-native';
-import { format, parseISO, isToday } from 'date-fns';
+import { Plus, Target } from 'lucide-react-native';
+import { format, parseISO, isToday, startOfWeek, addDays, isSameDay } from 'date-fns';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
@@ -60,30 +60,29 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-          <View style={styles.statsRow}>
-            <View style={styles.statCard}>
-              <View style={styles.statIcon}>
-                <Flame color={colors.warning} size={24} />
-              </View>
-              <Text style={styles.statValue}>{weeklyStats.totalCalories}</Text>
-              <Text style={styles.statLabel}>Calories</Text>
-            </View>
-
-            <View style={styles.statCard}>
-              <View style={styles.statIcon}>
-                <Timer color={colors.primary} size={24} />
-              </View>
-              <Text style={styles.statValue}>{Math.round(weeklyStats.totalDuration / 60)}</Text>
-              <Text style={styles.statLabel}>Minutes</Text>
-            </View>
-
-            <View style={styles.statCard}>
-              <View style={styles.statIcon}>
-                <TrendingUp color={colors.success} size={24} />
-              </View>
-              <Text style={styles.statValue}>{weeklyStats.totalDistance.toFixed(1)}</Text>
-              <Text style={styles.statLabel}>Km</Text>
-            </View>
+          <View style={styles.weekOverviewContainer}>
+            <Text style={styles.weekOverviewTitle}>This Week</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.weekScroll}>
+              {Array.from({ length: 7 }).map((_, index) => {
+                const day = addDays(startOfWeek(new Date(), { weekStartsOn: 0 }), index);
+                const isCurrentDay = isSameDay(day, new Date());
+                const hasActivity = activities.some(a => isSameDay(parseISO(a.date), day) && a.completed);
+                
+                return (
+                  <View key={index} style={[styles.dayCard, isCurrentDay && styles.dayCardActive]}>
+                    <Text style={[styles.dayName, isCurrentDay && styles.dayNameActive]}>
+                      {format(day, 'EEE')}
+                    </Text>
+                    <Text style={[styles.dayNumber, isCurrentDay && styles.dayNumberActive]}>
+                      {format(day, 'dd')}
+                    </Text>
+                    {hasActivity && (
+                      <View style={styles.activityDot} />
+                    )}
+                  </View>
+                );
+              })}
+            </ScrollView>
           </View>
 
           {todayActivities.length > 0 && (
@@ -229,41 +228,59 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
   },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 12,
+  weekOverviewContainer: {
     marginBottom: 32,
   },
-  statCard: {
-    flex: 1,
-    backgroundColor: colors.backgroundCard,
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  statIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.backgroundLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: '700' as const,
+  weekOverviewTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
     color: colors.text,
-    marginBottom: 4,
+    marginBottom: 12,
+    paddingHorizontal: 4,
   },
-  statLabel: {
+  weekScroll: {
+    flexGrow: 0,
+  },
+  dayCard: {
+    width: 60,
+    height: 70,
+    borderRadius: 16,
+    backgroundColor: colors.backgroundCard,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  dayCardActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  dayName: {
     fontSize: 12,
     color: colors.textSecondary,
+    marginBottom: 4,
+    fontWeight: '500' as const,
+  },
+  dayNameActive: {
+    color: '#FFFFFF',
+  },
+  dayNumber: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: colors.text,
+  },
+  dayNumberActive: {
+    color: '#FFFFFF',
+  },
+  activityDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.success,
+    marginTop: 4,
+    position: 'absolute',
+    bottom: 8,
   },
   section: {
     marginBottom: 32,
