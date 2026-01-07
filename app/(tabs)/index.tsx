@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { profile, activities, weeklyStats, onboardingCompleted, isLoading } = useApp();
+  const { profile, activities, weeklyStats, onboardingCompleted, isLoading, updateActivity } = useApp();
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -59,6 +59,17 @@ export default function HomeScreen() {
       setModalVisible(false);
       setSelectedActivity(null);
     });
+  };
+
+  const toggleWorkoutCompletion = async () => {
+    if (!selectedActivity) return;
+
+    try {
+      await updateActivity(selectedActivity.id, { completed: !selectedActivity.completed });
+      setSelectedActivity({ ...selectedActivity, completed: !selectedActivity.completed });
+    } catch (error) {
+      console.error('Error toggling workout completion:', error);
+    }
   };
 
   return (
@@ -310,6 +321,18 @@ export default function HomeScreen() {
                     {selectedActivity.completed ? '✓ Completed' : '⏳ Scheduled'}
                   </Text>
                 </View>
+
+                <TouchableOpacity
+                  style={[
+                    styles.markDoneButton,
+                    selectedActivity.completed && styles.markDoneButtonCompleted
+                  ]}
+                  onPress={toggleWorkoutCompletion}
+                >
+                  <Text style={styles.markDoneButtonText}>
+                    {selectedActivity.completed ? 'Mark as Incomplete' : 'Mark as Done'}
+                  </Text>
+                </TouchableOpacity>
               </ScrollView>
             )}
           </Animated.View>
@@ -740,5 +763,26 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: colors.primary,
+  },
+  markDoneButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginTop: 16,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  markDoneButtonCompleted: {
+    backgroundColor: colors.textSecondary,
+  },
+  markDoneButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600' as const,
   },
 });
