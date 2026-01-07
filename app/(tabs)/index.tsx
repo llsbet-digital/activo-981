@@ -66,18 +66,31 @@ export default function HomeScreen() {
               {Array.from({ length: 7 }).map((_, index) => {
                 const day = addDays(startOfWeek(new Date(), { weekStartsOn: 0 }), index);
                 const isSelected = isSameDay(day, selectedDay);
+                const isTodayDay = isToday(day);
                 const hasActivity = activities.some(a => isSameDay(parseISO(a.date), day) && a.completed);
                 
                 return (
                   <TouchableOpacity 
                     key={index} 
-                    style={[styles.dayCard, isSelected && styles.dayCardSelected]}
+                    style={[
+                      styles.dayCard,
+                      isTodayDay && styles.dayCardActive,
+                      isSelected && !isTodayDay && styles.dayCardSelected
+                    ]}
                     onPress={() => setSelectedDay(day)}
                   >
-                    <Text style={[styles.dayName, isSelected && styles.dayNameSelected]}>
+                    <Text style={[
+                      styles.dayName,
+                      isTodayDay && styles.dayNameActive,
+                      isSelected && !isTodayDay && styles.dayNameSelected
+                    ]}>
                       {format(day, 'EEE')}
                     </Text>
-                    <Text style={[styles.dayNumber, isSelected && styles.dayNumberSelected]}>
+                    <Text style={[
+                      styles.dayNumber,
+                      isTodayDay && styles.dayNumberActive,
+                      isSelected && !isTodayDay && styles.dayNumberSelected
+                    ]}>
                       {format(day, 'dd')}
                     </Text>
                     {hasActivity && (
