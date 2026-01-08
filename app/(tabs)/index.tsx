@@ -20,9 +20,9 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.replace('/login');
+      router.replace('/login' as any);
     } else if (!isLoading && !onboardingCompleted && isAuthenticated) {
-      router.replace('/onboarding');
+      router.replace('/onboarding' as any);
     }
   }, [isAuthenticated, authLoading, isLoading, onboardingCompleted]);
 

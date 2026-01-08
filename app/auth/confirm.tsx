@@ -20,7 +20,7 @@ export default function ConfirmEmail() {
         if (!token || type !== 'signup') {
           setStatus('error');
           setMessage('Invalid confirmation link');
-          setTimeout(() => router.replace('/login'), 3000);
+          setTimeout(() => router.replace('/login' as any), 3000);
           return;
         }
 
@@ -33,7 +33,7 @@ export default function ConfirmEmail() {
           console.error('Email confirmation error:', error);
           setStatus('error');
           setMessage('Failed to confirm email. Please try again.');
-          setTimeout(() => router.replace('/login'), 3000);
+          setTimeout(() => router.replace('/login' as any), 3000);
         } else {
           setStatus('success');
           setMessage('Email confirmed successfully!');
@@ -43,7 +43,7 @@ export default function ConfirmEmail() {
         console.error('Confirmation exception:', error);
         setStatus('error');
         setMessage('An error occurred. Please try again.');
-        setTimeout(() => router.replace('/login'), 3000);
+        setTimeout(() => router.replace('/login' as any), 3000);
       }
     };
 

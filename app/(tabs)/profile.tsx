@@ -36,7 +36,7 @@ export default function ProfileScreen() {
             if (error) {
               Alert.alert('Error', error.message);
             } else {
-              router.replace('/login');
+              router.replace('/login' as any);
             }
           },
         },
