@@ -1,6 +1,7 @@
 import { Tabs, router } from "expo-router";
-import { Home, BarChart3, User, Plus } from "lucide-react-native";
+import { Home, User, Plus } from "lucide-react-native";
 import { CalendarIcon } from "@/components/CalendarIcon";
+import { AnalyticsIcon } from "@/components/AnalyticsIcon";
 import React from "react";
 import { colors } from "@/constants/colors";
 import { TouchableOpacity, View, StyleSheet } from "react-native";
@@ -67,7 +68,7 @@ export default function TabLayout() {
         name="progress"
         options={{
           title: "Analytics",
-          tabBarIcon: ({ color, size }) => <BarChart3 color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <AnalyticsIcon color={color} size={size} />,
         }}
       />
       <Tabs.Screen
