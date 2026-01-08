@@ -1,7 +1,7 @@
 export const colors = {
-  primary: '#2E7CF6',
-  primaryDark: '#1E5FCF',
-  primaryLight: '#5B9BF8',
+  primary: '#3577E9',
+  primaryDark: '#2562C9',
+  primaryLight: '#5E92ED',
   
   success: '#34C759',
   successLight: '#A8E6B8',
@@ -30,7 +30,7 @@ export const colors = {
 } as const;
 
 export const gradients = {
-  primary: ['#2E7CF6', '#5B9BF8'],
+  primary: ['#3577E9', '#5E92ED'],
   success: ['#34C759', '#A8E6B8'],
   warning: ['#FF9500', '#FFD699'],
 } as const;
