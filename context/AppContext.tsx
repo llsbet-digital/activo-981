@@ -6,6 +6,7 @@ import { startOfWeek, endOfWeek, isWithinInterval, parseISO } from 'date-fns';
 import { useAuth } from './AuthContext';
 import { profileService, activityService } from '@/lib/database';
 import { notificationService } from '@/lib/notification-service';
+import { testSupabaseConnection } from '@/lib/supabase';
 
 const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: 'onboarding_completed',
@@ -17,16 +18,31 @@ export const [AppProvider, useApp] = createContextHook(() => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
+      setConnectionError(null);
+      
       const onboardingData = await AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED);
       if (onboardingData) {
         setOnboardingCompleted(JSON.parse(onboardingData));
       }
 
       if (isAuthenticated && user) {
+        const connectionTest = await testSupabaseConnection();
+        if (!connectionTest) {
+          setConnectionError(
+            'Unable to connect to database. This may be due to:\n\n' +
+            '• CORS configuration (web only)\n' +
+            '• Paused Supabase project\n' +
+            '• Network issues\n\n' +
+            'To fix CORS on web: Add your dev server URL to Supabase Dashboard > Authentication > URL Configuration'
+          );
+          return;
+        }
+
         const [profileData, activitiesData] = await Promise.all([
           profileService.getProfile(user.id),
           activityService.getActivities(user.id),
@@ -46,11 +62,23 @@ export const [AppProvider, useApp] = createContextHook(() => {
       console.error('\n❌ ERROR LOADING APP DATA');
       console.error('Error message:', error?.message || String(error));
       console.error('Full error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-      console.error('\n💡 If you see connection errors:');
-      console.error('1. Check that your Supabase project is active');
-      console.error('2. Verify environment variables are set correctly');
-      console.error('3. Make sure you have internet connection');
-      console.error('4. Try restarting the development server\n');
+      
+      const isConnectionError = 
+        error?.message?.includes('fetch') || 
+        error?.message?.includes('Cannot connect') ||
+        error?.message?.includes('NetworkError');
+      
+      if (isConnectionError) {
+        setConnectionError(
+          'Connection failed. Please check:\n\n' +
+          '• Your internet connection\n' +
+          '• Supabase project is active\n' +
+          '• Environment variables are correct\n' +
+          '• CORS is configured (web only)'
+        );
+      } else {
+        setConnectionError(error?.message || 'An unexpected error occurred');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -171,11 +199,13 @@ export const [AppProvider, useApp] = createContextHook(() => {
     activities,
     onboardingCompleted,
     isLoading,
+    connectionError,
     weeklyStats,
     updateProfile,
     addActivity,
     updateActivity,
     deleteActivity,
     completeOnboarding,
+    retryConnection: loadData,
   };
 });

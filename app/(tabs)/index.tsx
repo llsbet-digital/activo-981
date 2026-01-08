@@ -1,20 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Animated, Dimensions, Easing } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Animated, Dimensions, Easing, ActivityIndicator } from 'react-native';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
-import { Target, X, Clock, MapPin, Flame, Calendar, Link as LinkIcon, Dumbbell } from 'lucide-react-native';
+import { Target, X, Clock, MapPin, Flame, Calendar, Link as LinkIcon, Dumbbell, AlertCircle, RefreshCw } from 'lucide-react-native';
 import { format, parseISO, isToday, startOfWeek, addDays, isSameDay } from 'date-fns';
 import { Activity } from '@/types/activity';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { profile, activities, weeklyStats, onboardingCompleted, isLoading, updateActivity } = useApp();
+  const { profile, activities, weeklyStats, onboardingCompleted, isLoading, updateActivity, connectionError, retryConnection } = useApp();
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current;
 
   useEffect(() => {
@@ -68,6 +69,40 @@ export default function HomeScreen() {
       console.error('Error toggling workout completion:', error);
     }
   };
+
+  const handleRetry = async () => {
+    setIsRetrying(true);
+    await retryConnection();
+    setIsRetrying(false);
+  };
+
+  if (connectionError) {
+    return (
+      <View style={styles.container}>
+        <SafeAreaView edges={['top']} style={styles.safeArea}>
+          <View style={styles.errorContainer}>
+            <AlertCircle color={colors.error} size={64} />
+            <Text style={styles.errorTitle}>Connection Error</Text>
+            <Text style={styles.errorMessage}>{connectionError}</Text>
+            <TouchableOpacity 
+              style={styles.retryButton} 
+              onPress={handleRetry}
+              disabled={isRetrying}
+            >
+              {isRetrying ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <>
+                  <RefreshCw color="#fff" size={20} />
+                  <Text style={styles.retryButtonText}>Retry Connection</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -753,6 +788,46 @@ const styles = StyleSheet.create({
     backgroundColor: colors.textSecondary,
   },
   markDoneButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  errorTitle: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    color: colors.text,
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  errorMessage: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 32,
+  },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 8,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  retryButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600' as const,
