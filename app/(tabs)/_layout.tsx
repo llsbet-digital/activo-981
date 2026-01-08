@@ -48,23 +48,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <CalendarIcon color={color} size={size} />,
         }}
       />
-      <Tabs.Screen
-        name="add-workout"
-        options={{
-          title: '',
-          tabBarIcon: () => null,
-          tabBarButton: () => (
-            <View style={styles.fabContainer}>
-              <TouchableOpacity 
-                style={styles.fabButton}
-                onPress={() => router.push('/add-activity' as any)}
-              >
-                <Plus color="#FFFFFF" size={28} strokeWidth={2.5} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
-      />
+    
       <Tabs.Screen
         name="progress"
         options={{
