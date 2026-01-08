@@ -1,7 +1,8 @@
 import { Tabs, router } from "expo-router";
-import { Home, User, Plus } from "lucide-react-native";
+import { Home, Plus } from "lucide-react-native";
 import { CalendarIcon } from "@/components/CalendarIcon";
 import { AnalyticsIcon } from "@/components/AnalyticsIcon";
+import { ProfileIcon } from "@/components/ProfileIcon";
 import React from "react";
 import { colors } from "@/constants/colors";
 import { TouchableOpacity, View, StyleSheet } from "react-native";
@@ -75,7 +76,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <ProfileIcon color={color} size={size} />,
         }}
       />
     </Tabs>
