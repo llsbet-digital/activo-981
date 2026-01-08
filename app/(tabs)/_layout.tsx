@@ -1,5 +1,5 @@
 import { Tabs, router } from "expo-router";
-import { Home, Calendar, TrendingUp, User, Plus } from "lucide-react-native";
+import { Home, Calendar, BarChart3, User, Plus } from "lucide-react-native";
 import React from "react";
 import { colors } from "@/constants/colors";
 import { TouchableOpacity, View, StyleSheet } from "react-native";
@@ -9,44 +9,28 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textMuted,
+        tabBarInactiveTintColor: '#9CA3AF',
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.backgroundCard,
-          borderTopColor: colors.border,
-          borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
-          shadowColor: colors.shadow,
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 1,
-          shadowRadius: 8,
+          backgroundColor: '#FFFFFF',
+          borderTopColor: 'transparent',
+          borderTopWidth: 0,
+          height: 80,
+          paddingBottom: 20,
+          paddingTop: 12,
+          shadowColor: '#000000',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.08,
+          shadowRadius: 12,
           elevation: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600' as const,
+          fontSize: 12,
+          fontWeight: '500' as const,
+          marginTop: 4,
         },
       }}
     >
-      <Tabs.Screen
-        name="add-workout"
-        options={{
-          title: '',
-          tabBarIcon: () => null,
-          tabBarButton: () => (
-            <View style={styles.fabContainer}>
-              <TouchableOpacity 
-                style={styles.fabButton}
-                onPress={() => router.push('/add-activity' as any)}
-              >
-                <Plus color="#FFFFFF" size={24} />
-              </TouchableOpacity>
-            </View>
-          ),
-        }}
-      />
       <Tabs.Screen
         name="index"
         options={{
@@ -61,12 +45,28 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Calendar color={color} size={size} />,
         }}
       />
-     
+      <Tabs.Screen
+        name="add-workout"
+        options={{
+          title: '',
+          tabBarIcon: () => null,
+          tabBarButton: () => (
+            <View style={styles.fabContainer}>
+              <TouchableOpacity 
+                style={styles.fabButton}
+                onPress={() => router.push('/add-activity' as any)}
+              >
+                <Plus color="#FFFFFF" size={28} strokeWidth={2.5} />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+      />
       <Tabs.Screen
         name="progress"
         options={{
-          title: "Progress",
-          tabBarIcon: ({ color, size }) => <TrendingUp color={color} size={size} />,
+          title: "Analytics",
+          tabBarIcon: ({ color, size }) => <BarChart3 color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -85,19 +85,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: -30,
   },
   fabButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -30,
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
   },
 });
