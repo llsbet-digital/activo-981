@@ -4,7 +4,7 @@ import { useApp } from '@/context/AppContext';
 import { colors } from '@/constants/colors';
 import { Calendar as CalendarComponent, DateData } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isAfter, startOfDay } from 'date-fns';
 import { Clock, MapPin, Check } from 'lucide-react-native';
 import { Activity } from '@/types/activity';
 
@@ -44,6 +44,10 @@ export default function CalendarScreen() {
   const selectedActivities = activities.filter(
     (activity) => activity.date.split('T')[0] === selectedDate
   );
+
+  const upcomingActivities = activities.filter(
+    (activity) => !activity.completed && isAfter(parseISO(activity.date), startOfDay(new Date()))
+  ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const handleToggleComplete = async (activity: Activity) => {
     await updateActivity(activity.id, { completed: !activity.completed });
@@ -148,6 +152,41 @@ export default function CalendarScreen() {
               ))
             )}
           </View>
+
+          {upcomingActivities.length > 0 && (
+            <View style={styles.upcomingSection}>
+              <Text style={styles.sectionTitle}>Upcoming Workouts</Text>
+              {upcomingActivities.map((activity) => (
+                <TouchableOpacity
+                  key={activity.id}
+                  style={styles.activityCard}
+                  onPress={() => handleToggleComplete(activity)}
+                >
+                  <View style={styles.activityHeader}>
+                    <View style={styles.activityIconContainer}>
+                      <Text style={styles.activityEmoji}>{getActivityEmoji(activity.type)}</Text>
+                    </View>
+                    <View style={styles.activityInfo}>
+                      <Text style={styles.activityTitle}>{activity.title}</Text>
+                      <Text style={styles.activityDate}>
+                        {format(parseISO(activity.date), 'EEE, MMM d')}
+                      </Text>
+                      <View style={styles.activityDetails}>
+                        <Clock color={colors.textSecondary} size={14} />
+                        <Text style={styles.activityDetailText}>{activity.duration} min</Text>
+                        {activity.distance && (
+                          <>
+                            <MapPin color={colors.textSecondary} size={14} />
+                            <Text style={styles.activityDetailText}>{activity.distance} km</Text>
+                          </>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -282,5 +321,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  upcomingSection: {
+    paddingHorizontal: 20,
+    marginTop: 24,
+  },
+  activityDate: {
+    fontSize: 13,
+    color: colors.primary,
+    fontWeight: '600' as const,
+    marginBottom: 4,
   },
 });

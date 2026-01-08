@@ -34,9 +34,6 @@ export default function HomeScreen() {
   }
 
   const todayActivities = activities.filter((a) => isToday(parseISO(a.date)));
-  const selectedDayActivities = activities.filter(
-    (a) => !a.completed && isSameDay(parseISO(a.date), selectedDay)
-  );
 
   const openWorkoutModal = (activity: Activity) => {
     setSelectedActivity(activity);
@@ -140,7 +137,7 @@ export default function HomeScreen() {
             </ScrollView>
           </View>
 
-          {todayActivities.length > 0 && (
+          {todayActivities.length > 0 ? (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Today&apos;s Activities</Text>
               {todayActivities.map((activity) => (
@@ -166,36 +163,11 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          )}
-
-          {selectedDayActivities.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Upcoming Workouts</Text>
-              {selectedDayActivities.map((activity) => (
-                <TouchableOpacity 
-                  key={activity.id} 
-                  style={styles.activityCard}
-                  onPress={() => openWorkoutModal(activity)}
-                >
-                  <View style={styles.activityIcon}>
-                    <Text style={styles.activityEmoji}>📅</Text>
-                  </View>
-                  <View style={styles.activityInfo}>
-                    <Text style={styles.activityTitle}>{activity.title}</Text>
-                    <Text style={styles.activityTime}>
-                      {activity.duration} min • {activity.distance || 0} km
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {selectedDayActivities.length === 0 && (
+          ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyEmoji}>🎯</Text>
-              <Text style={styles.emptyTitle}>No workouts scheduled</Text>
-              <Text style={styles.emptyText}>Add your first workout for this day!</Text>
+              <Text style={styles.emptyTitle}>No workouts today</Text>
+              <Text style={styles.emptyText}>Add your first workout for today!</Text>
               <TouchableOpacity
                 style={styles.addButton}
                 onPress={() => router.push('/add-activity' as any)}
