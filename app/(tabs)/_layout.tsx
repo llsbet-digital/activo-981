@@ -1,5 +1,6 @@
 import { Tabs, router } from "expo-router";
-import { Home, Calendar, BarChart3, User, Plus } from "lucide-react-native";
+import { Home, BarChart3, User, Plus } from "lucide-react-native";
+import { CalendarIcon } from "@/components/CalendarIcon";
 import React from "react";
 import { colors } from "@/constants/colors";
 import { TouchableOpacity, View, StyleSheet } from "react-native";
@@ -42,7 +43,7 @@ export default function TabLayout() {
         name="calendar"
         options={{
           title: "Calendar",
-          tabBarIcon: ({ color, size }) => <Calendar color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <CalendarIcon color={color} size={size} />,
         }}
       />
       <Tabs.Screen
