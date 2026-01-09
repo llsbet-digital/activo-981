@@ -38,6 +38,7 @@ export default function CalendarScreen() {
       ...markedDates[selectedDate],
       selected: true,
       selectedColor: colors.primary,
+      selectedTextColor: '#FFFFFF',
     };
   }
 
@@ -75,12 +76,13 @@ export default function CalendarScreen() {
                 calendarBackground: colors.backgroundCard,
                 textSectionTitleColor: colors.textSecondary,
                 selectedDayBackgroundColor: colors.primary,
-                selectedDayTextColor: colors.text,
-                todayTextColor: colors.primary,
+                selectedDayTextColor: '#FFFFFF',
+                todayTextColor: '#FFFFFF',
+                todayBackgroundColor: colors.primary,
                 dayTextColor: colors.text,
                 textDisabledColor: colors.textMuted,
                 dotColor: colors.success,
-                selectedDotColor: colors.text,
+                selectedDotColor: '#FFFFFF',
                 arrowColor: colors.primary,
                 monthTextColor: colors.text,
                 indicatorColor: colors.primary,

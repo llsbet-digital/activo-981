@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   weekOverviewContainer: {
-    marginBottom: 32,
+    marginBottom: 16,
   },
   weekOverviewTitle: {
     fontSize: 16,
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundCard,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: 4,
     borderWidth: 1,
     borderColor: colors.borderLight,
   },
