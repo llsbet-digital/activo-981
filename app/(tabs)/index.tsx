@@ -132,7 +132,7 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.weekOverviewContainer}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.weekScroll}>
+            <View style={styles.weekScroll}>
               {Array.from({ length: 7 }).map((_, index) => {
                 const day = addDays(startOfWeek(new Date(), { weekStartsOn: 0 }), index);
                 const isSelected = isSameDay(day, selectedDay);
@@ -169,7 +169,7 @@ export default function HomeScreen() {
                   </TouchableOpacity>
                 );
               })}
-            </ScrollView>
+            </View>
           </View>
 
           {todayActivities.length > 0 ? (
@@ -440,7 +440,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   weekScroll: {
-    flexGrow: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   dayCard: {
     width: 48,
