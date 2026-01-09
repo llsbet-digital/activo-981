@@ -3,6 +3,8 @@ import { Home, Plus } from "lucide-react-native";
 import { CalendarIcon } from "@/components/CalendarIcon";
 import { AnalyticsIcon } from "@/components/AnalyticsIcon";
 import { ProfileIcon } from "@/components/ProfileIcon";
+import { HomeIcon} from "@/components/HomeIcon";
+
 import React from "react";
 import { colors } from "@/constants/colors";
 import { TouchableOpacity, View, StyleSheet } from "react-native";
@@ -38,7 +40,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <HomeIcon color={color} size={size} />,
         }}
       />
       <Tabs.Screen
