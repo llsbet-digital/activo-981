@@ -443,8 +443,8 @@ const styles = StyleSheet.create({
     flexGrow: 0,
   },
   dayCard: {
-    width: 60,
-    height: 70,
+    width: 48,
+    height: 64,
     borderRadius: 16,
     backgroundColor: colors.backgroundCard,
     alignItems: 'center',
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
     borderColor: '#90CAF9',
   },
   dayName: {
-    fontSize: 12,
+    fontSize: 10,
     color: colors.textSecondary,
     marginBottom: 4,
     fontWeight: '500' as const,
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     color: '#1976D2',
   },
   dayNumber: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700' as const,
     color: colors.text,
   },
