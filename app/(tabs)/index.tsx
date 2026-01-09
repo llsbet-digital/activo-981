@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Animated, Dimensions, Easing, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Animated, Dimensions, Easing, ActivityIndicator, Image } from 'react-native';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
-import { Target, X, Clock, MapPin, Flame, Calendar, Link as LinkIcon, Dumbbell, AlertCircle, RefreshCw } from 'lucide-react-native';
+import { X, Clock, MapPin, Flame, Calendar, Link as LinkIcon, Dumbbell, AlertCircle, RefreshCw } from 'lucide-react-native';
 import { format, parseISO, isToday, startOfWeek, addDays, isSameDay } from 'date-fns';
 import { Activity } from '@/types/activity';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -118,7 +118,10 @@ export default function HomeScreen() {
           <View style={styles.progressCard}>
             <View style={styles.progressHeader}>
               <Text style={styles.progressTitle}>Weekly Progress</Text>
-              <Target color={colors.primary} size={20} />
+              <Image 
+                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/5drdnkupxdvfhreh342ip' }} 
+                style={styles.progressIcon}
+              />
             </View>
             <Text style={styles.progressPercentage}>{Math.round(weeklyStats.weekProgress)}%</Text>
             <View style={styles.progressBarBg}>
@@ -428,6 +431,10 @@ const styles = StyleSheet.create({
   progressSubtitle: {
     fontSize: 14,
     color: colors.textSecondary,
+  },
+  progressIcon: {
+    width: 24,
+    height: 24,
   },
   weekOverviewContainer: {
     marginBottom: 16,
