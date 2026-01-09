@@ -433,8 +433,8 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   progressIcon: {
-    width: 24,
-    height: 24,
+    width: 56,
+    height: 56,
   },
   weekOverviewContainer: {
     marginBottom: 16,
