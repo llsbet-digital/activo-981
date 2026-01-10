@@ -34,7 +34,7 @@ export default function HomeScreen() {
     );
   }
 
-  const todayActivities = activities.filter((a) => isToday(parseISO(a.date)));
+  const selectedDayActivities = activities.filter((a) => isSameDay(parseISO(a.date), selectedDay));
 
   const openWorkoutModal = (activity: Activity) => {
     setSelectedActivity(activity);
@@ -175,10 +175,12 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {todayActivities.length > 0 ? (
+          {selectedDayActivities.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Today&apos;s Activities</Text>
-              {todayActivities.map((activity) => (
+              <Text style={styles.sectionTitle}>
+                {isToday(selectedDay) ? "Today's Activities" : format(selectedDay, 'EEEE, MMM d')}
+              </Text>
+              {selectedDayActivities.map((activity) => (
                 <TouchableOpacity 
                   key={activity.id} 
                   style={styles.activityCard}
@@ -200,18 +202,6 @@ export default function HomeScreen() {
                   )}
                 </TouchableOpacity>
               ))}
-            </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>🎯</Text>
-              <Text style={styles.emptyTitle}>No workouts today</Text>
-              <Text style={styles.emptyText}>Add your first workout for today!</Text>
-              <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => router.push('/add-activity' as any)}
-              >
-                <Text style={styles.addButtonText}>Add Workout</Text>
-              </TouchableOpacity>
             </View>
           )}
         </ScrollView>
