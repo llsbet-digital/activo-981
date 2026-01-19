@@ -1,13 +1,13 @@
 import { Tabs, router } from "expo-router";
-import { Home, Plus } from "lucide-react-native";
+import { Plus } from "lucide-react-native";
 import { CalendarIcon } from "@/components/CalendarIcon";
 import { AnalyticsIcon } from "@/components/AnalyticsIcon";
 import { ProfileIcon } from "@/components/ProfileIcon";
-import { HomeIcon} from "@/components/HomeIcon";
+import { HomeIcon } from "@/components/HomeIcon";
 
 import React from "react";
 import { colors } from "@/constants/colors";
-import { TouchableOpacity, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 export default function TabLayout() {
   return (
@@ -50,7 +50,25 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <CalendarIcon color={color} size={size} />,
         }}
       />
-    
+      <Tabs.Screen
+        name="add"
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            router.push('/add-activity');
+          },
+        }}
+        options={{
+          title: "",
+          tabBarIcon: () => (
+            <View style={styles.fabContainer}>
+              <View style={styles.fabButton}>
+                <Plus color="#FFFFFF" size={28} strokeWidth={2.5} />
+              </View>
+            </View>
+          ),
+        }}
+      />
       <Tabs.Screen
         name="progress"
         options={{
@@ -71,22 +89,23 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   fabContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -30,
+    marginTop: -32,
   },
   fabButton: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.primary,
+    backgroundColor: '#3577E9',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
     elevation: 8,
   },
 });
