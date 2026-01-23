@@ -413,7 +413,6 @@ const styles = StyleSheet.create({
   },
   upcomingSection: {
     paddingHorizontal: 20,
-    marginTop: 24,
   },
 
   modalOverlay: {
