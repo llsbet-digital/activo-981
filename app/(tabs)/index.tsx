@@ -180,28 +180,31 @@ export default function HomeScreen() {
               <Text style={styles.sectionTitle}>
                 {isToday(selectedDay) ? "Today's Activities" : format(selectedDay, 'EEEE, MMM d')}
               </Text>
-              {selectedDayActivities.map((activity) => (
+              <View style={styles.activitiesContainer}>
+              {selectedDayActivities.map((activity, index) => (
                 <TouchableOpacity 
                   key={activity.id} 
-                  style={styles.activityCard}
+                  style={[styles.activityCard, index > 0 && styles.activityCardBorder]}
                   onPress={() => openWorkoutModal(activity)}
                 >
-                  <View style={styles.activityIcon}>
-                    <Text style={styles.activityEmoji}>🏃</Text>
-                  </View>
                   <View style={styles.activityInfo}>
                     <Text style={styles.activityTitle}>{activity.title}</Text>
-                    <Text style={styles.activityTime}>
-                      {activity.duration} min • {activity.distance || 0} km
-                    </Text>
+                    <Text style={styles.activityType}>{activity.type}</Text>
                   </View>
-                  {activity.completed && (
-                    <View style={styles.completedBadge}>
-                      <Text style={styles.completedText}>✓</Text>
+                  <View style={styles.activityRight}>
+                    <View style={styles.durationContainer}>
+                      <Clock color="#9CA3AF" size={16} />
+                      <Text style={styles.durationText}>{activity.duration} min</Text>
                     </View>
-                  )}
+                    {activity.completed && (
+                      <View style={styles.completedBadge}>
+                        <Text style={styles.completedText}>✓</Text>
+                      </View>
+                    )}
+                  </View>
                 </TouchableOpacity>
               ))}
+              </View>
             </View>
           )}
         </ScrollView>
@@ -501,56 +504,61 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 16,
   },
+  activitiesContainer: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
   activityCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.backgroundCard,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 2,
+    justifyContent: 'space-between',
+    backgroundColor: '#F9FAFB',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
   },
-  activityIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.backgroundLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  activityEmoji: {
-    fontSize: 24,
+  activityCardBorder: {
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
   },
   activityInfo: {
     flex: 1,
   },
   activityTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600' as const,
     color: colors.text,
     marginBottom: 4,
   },
-  activityTime: {
+  activityType: {
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  activityRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  durationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  durationText: {
     fontSize: 14,
     color: colors.textSecondary,
   },
   completedBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.success,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   completedText: {
     color: '#FFFFFF',
-    fontWeight: '700' as const,
-    fontSize: 16,
+    fontWeight: '600' as const,
+    fontSize: 14,
   },
   emptyState: {
     alignItems: 'center',

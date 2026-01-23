@@ -141,85 +141,63 @@ export default function CalendarScreen() {
                 <Text style={styles.emptyText}>No activities scheduled for this day</Text>
               </View>
             ) : (
-              selectedActivities.map((activity) => (
-                <TouchableOpacity
-                  key={activity.id}
-                  style={[
-                    styles.activityCard,
-                    activity.completed && styles.activityCardCompleted,
-                  ]}
-                  onPress={() => openWorkoutModal(activity)}
-                >
-                  <View style={styles.activityHeader}>
-                    <View style={styles.activityIconContainer}>
-                      <Text style={styles.activityEmoji}>{getActivityEmoji(activity.type)}</Text>
-                    </View>
+              <View style={styles.activitiesContainer}>
+                {selectedActivities.map((activity, index) => (
+                  <TouchableOpacity
+                    key={activity.id}
+                    style={[
+                      styles.activityCard,
+                      index > 0 && styles.activityCardBorder,
+                    ]}
+                    onPress={() => openWorkoutModal(activity)}
+                  >
                     <View style={styles.activityInfo}>
-                      <Text
-                        style={[
-                          styles.activityTitle,
-                          activity.completed && styles.activityTitleCompleted,
-                        ]}
-                      >
-                        {activity.title}
-                      </Text>
-                      <View style={styles.activityDetails}>
-                        <Clock color={colors.textSecondary} size={14} />
-                        <Text style={styles.activityDetailText}>{activity.duration} min</Text>
-                        {activity.distance && (
-                          <>
-                            <MapPin color={colors.textSecondary} size={14} />
-                            <Text style={styles.activityDetailText}>{activity.distance} km</Text>
-                          </>
-                        )}
-                      </View>
+                      <Text style={styles.activityTitle}>{activity.title}</Text>
+                      <Text style={styles.activityType}>{activity.type}</Text>
                     </View>
-                    {activity.completed && (
-                      <View style={styles.completedBadge}>
-                        <Check color={colors.text} size={18} />
+                    <View style={styles.activityRight}>
+                      <View style={styles.durationContainer}>
+                        <Clock color="#9CA3AF" size={16} />
+                        <Text style={styles.durationText}>{activity.duration} min</Text>
                       </View>
-                    )}
-                  </View>
-                  {activity.notes && (
-                    <Text style={styles.activityNotes}>{activity.notes}</Text>
-                  )}
-                </TouchableOpacity>
-              ))
+                      {activity.completed && (
+                        <View style={styles.completedBadge}>
+                          <Check color="#FFFFFF" size={16} />
+                        </View>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
             )}
           </View>
 
           {upcomingActivities.length > 0 && (
             <View style={styles.upcomingSection}>
               <Text style={styles.sectionTitle}>Upcoming Workouts</Text>
-              {upcomingActivities.map((activity) => (
-                <TouchableOpacity
-                  key={activity.id}
-                  style={styles.activityCard}
-                  onPress={() => openWorkoutModal(activity)}
-                >
-                  <View style={styles.activityHeader}>
-                    <View style={styles.activityIconContainer}>
-                      <Text style={styles.activityEmoji}>{getActivityEmoji(activity.type)}</Text>
-                    </View>
+              <View style={styles.activitiesContainer}>
+                {upcomingActivities.map((activity, index) => (
+                  <TouchableOpacity
+                    key={activity.id}
+                    style={[
+                      styles.activityCard,
+                      index > 0 && styles.activityCardBorder,
+                    ]}
+                    onPress={() => openWorkoutModal(activity)}
+                  >
                     <View style={styles.activityInfo}>
                       <Text style={styles.activityTitle}>{activity.title}</Text>
-                      <Text style={styles.activityDate}>
-                        {format(parseISO(activity.date), 'EEE, MMM d')}
-                      </Text>
-                      <View style={styles.activityDetails}>
-                        <Clock color={colors.textSecondary} size={14} />
-                        <Text style={styles.activityDetailText}>{activity.duration} min</Text>
-                        {activity.distance && (
-                          <>
-                            <MapPin color={colors.textSecondary} size={14} />
-                            <Text style={styles.activityDetailText}>{activity.distance} km</Text>
-                          </>
-                        )}
+                      <Text style={styles.activityType}>{activity.type}</Text>
+                    </View>
+                    <View style={styles.activityRight}>
+                      <View style={styles.durationContainer}>
+                        <Clock color="#9CA3AF" size={16} />
+                        <Text style={styles.durationText}>{activity.duration} min</Text>
                       </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           )}
         </ScrollView>
@@ -409,70 +387,54 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 16,
   },
-  activityCard: {
-    backgroundColor: colors.backgroundCard,
+  activitiesContainer: {
     borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 2,
+    overflow: 'hidden',
   },
-  activityCardCompleted: {
-    opacity: 0.7,
-  },
-  activityHeader: {
+  activityCard: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F9FAFB',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
   },
-  activityIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.backgroundLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  activityEmoji: {
-    fontSize: 24,
+  activityCardBorder: {
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
   },
   activityInfo: {
     flex: 1,
   },
   activityTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600' as const,
     color: colors.text,
-    marginBottom: 6,
+    marginBottom: 4,
   },
-  activityTitleCompleted: {
-    textDecorationLine: 'line-through',
+  activityType: {
+    fontSize: 14,
     color: colors.textSecondary,
   },
-  activityDetails: {
+  activityRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  durationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
-  activityDetailText: {
+  durationText: {
     fontSize: 14,
     color: colors.textSecondary,
-    marginRight: 8,
-  },
-  activityNotes: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginTop: 12,
-    lineHeight: 20,
   },
   completedBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.success,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -493,12 +455,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 24,
   },
-  activityDate: {
-    fontSize: 13,
-    color: colors.primary,
-    fontWeight: '600' as const,
-    marginBottom: 4,
-  },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
