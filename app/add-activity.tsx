@@ -81,10 +81,14 @@ export default function AddActivityScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardView}
         >
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.header}>
+            <View style={styles.headerSpacer} />
             <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
               <X color={colors.text} size={24} />
             </TouchableOpacity>
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
             <View style={styles.section}>
               <Text style={styles.label}>Activity Type</Text>
               <View style={styles.activitiesGrid}>
@@ -231,6 +235,17 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+  },
+  headerSpacer: {
+    flex: 1,
+  },
   closeButton: {
     width: 40,
     height: 40,
@@ -238,8 +253,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundCard,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'flex-end',
-    marginBottom: 16,
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 1,
@@ -248,7 +261,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 20,
     paddingBottom: 120,
   },
   section: {

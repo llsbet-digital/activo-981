@@ -8,12 +8,8 @@ import { HomeIcon } from "@/components/HomeIcon";
 import React from "react";
 import { colors } from "@/constants/colors";
 import { View, StyleSheet } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
-  const insets = useSafeAreaInsets();
-  const bottomPadding = Math.max(insets.bottom, 10);
-  
   return (
     <Tabs
       screenOptions={{
@@ -24,9 +20,9 @@ export default function TabLayout() {
           backgroundColor: '#FFFFFF',
           borderTopColor: 'transparent',
           borderTopWidth: 0,
-          height: 60 + bottomPadding,
-          paddingBottom: bottomPadding,
-          paddingTop: 8,
+          height: 80,
+          paddingBottom: 20,
+          paddingTop: 12,
           shadowColor: '#000000',
           shadowOffset: { width: 0, height: -4 },
           shadowOpacity: 0.08,
