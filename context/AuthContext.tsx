@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Platform } from 'react-native';
 import { Session, User, AuthError } from '@supabase/supabase-js';
 import createContextHook from '@nkzw/create-context-hook';
+import * as Linking from 'expo-linking';
 import { supabase } from '@/lib/supabase';
 
 export const [AuthProvider, useAuth] = createContextHook(() => {
@@ -41,11 +43,17 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
         };
       }
       
+      const redirectUrl = Platform.OS === 'web' 
+        ? `${window.location.origin}/auth/confirm`
+        : Linking.createURL('auth/confirm');
+      
+      console.log('📧 Email redirect URL:', redirectUrl);
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: 'rork-app://auth/confirm',
+          emailRedirectTo: redirectUrl,
         },
       });
       if (error) {
