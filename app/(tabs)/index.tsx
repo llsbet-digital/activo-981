@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
     height: 56,
   },
   weekOverviewContainer: {
-    marginBottom: 0,
+    marginBottom: 24,
   },
   weekOverviewTitle: {
     fontSize: 16,
