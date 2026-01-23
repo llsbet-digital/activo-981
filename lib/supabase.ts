@@ -120,22 +120,5 @@ supabase.auth.onAuthStateChange((event, session) => {
 Linking.addEventListener('url', ({ url }) => {
   console.log('Deep link received:', url);
   const { path, queryParams } = Linking.parse(url);
-  
-  if (path === 'auth/confirm' && queryParams) {
-    const token = queryParams.token as string;
-    const type = queryParams.type as string;
-    
-    if (token && type === 'email') {
-      supabase.auth.verifyOtp({
-        token_hash: token,
-        type: 'email',
-      }).then(({ error }) => {
-        if (error) {
-          console.error('Email confirmation error:', error);
-        } else {
-          console.log('Email confirmed successfully');
-        }
-      });
-    }
-  }
+  console.log('Parsed deep link - path:', path, 'params:', queryParams);
 });

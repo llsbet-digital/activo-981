@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import * as Linking from 'expo-linking';
 import { supabase } from '@/lib/supabase';
 
 export default function ConfirmEmail() {
@@ -12,43 +13,66 @@ export default function ConfirmEmail() {
   useEffect(() => {
     const confirmEmail = async () => {
       try {
-        console.log('Email confirmation params:', params);
+        console.log('Email confirmation params from router:', params);
+        
+        const initialUrl = await Linking.getInitialURL();
+        console.log('Initial URL:', initialUrl);
+        
+        let tokenHash = params.token_hash as string || params.token as string;
+        let type = params.type as string;
+        
+        if (initialUrl) {
+          const parsed = Linking.parse(initialUrl);
+          console.log('Parsed URL:', parsed);
+          
+          if (parsed.queryParams) {
+            tokenHash = tokenHash || (parsed.queryParams.token_hash as string) || (parsed.queryParams.token as string);
+            type = type || (parsed.queryParams.type as string);
+          }
+        }
+        
+        console.log('Token hash:', tokenHash);
+        console.log('Type:', type);
 
-        const token = params.token as string;
-        const type = params.type as string;
-
-        if (!token || type !== 'signup') {
+        if (!tokenHash) {
           setStatus('error');
-          setMessage('Invalid confirmation link');
+          setMessage('Invalid confirmation link - missing token');
           setTimeout(() => router.replace('/login' as any), 3000);
           return;
         }
 
-        const { error } = await supabase.auth.verifyOtp({
-          token_hash: token,
-          type: 'signup',
+        const validTypes = ['signup', 'email', 'magiclink', 'recovery', 'invite'];
+        const otpType = validTypes.includes(type) ? type : 'signup';
+        
+        console.log('Verifying OTP with type:', otpType);
+
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: otpType as any,
         });
 
         if (error) {
           console.error('Email confirmation error:', error);
           setStatus('error');
-          setMessage('Failed to confirm email. Please try again.');
+          setMessage(error.message || 'Failed to confirm email. Please try again.');
           setTimeout(() => router.replace('/login' as any), 3000);
         } else {
+          console.log('Email confirmed successfully, session:', data.session?.user?.email);
           setStatus('success');
           setMessage('Email confirmed successfully!');
           setTimeout(() => router.replace('/(tabs)'), 2000);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Confirmation exception:', error);
         setStatus('error');
-        setMessage('An error occurred. Please try again.');
+        setMessage(error?.message || 'An error occurred. Please try again.');
         setTimeout(() => router.replace('/login' as any), 3000);
       }
     };
 
     confirmEmail();
-  }, [params, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <View style={styles.container}>
