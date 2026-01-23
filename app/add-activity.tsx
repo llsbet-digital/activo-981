@@ -227,7 +227,7 @@ export default function AddActivityScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
   },
   safeArea: {
     flex: 1,
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 40,
     paddingTop: 20,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
   },
   saveButton: {
     borderRadius: 16,
