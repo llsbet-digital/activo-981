@@ -1,8 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Animated, Dimensions, Easing } from 'react-native';
 import { useApp } from '@/context/AppContext';
 import { colors } from '@/constants/colors';
-import { Calendar as CalendarComponent, DateData } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { format, parseISO, isAfter, startOfDay } from 'date-fns';
 import { Clock, MapPin, Check, X, Flame, Calendar, Link as LinkIcon, Dumbbell } from 'lucide-react-native';
@@ -23,31 +22,9 @@ const getActivityEmoji = (type: string) => {
 
 export default function CalendarScreen() {
   const { activities, updateActivity } = useApp();
-  const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedActivity, setSelectedActivity] = React.useState<Activity | null>(null);
+  const [modalVisible, setModalVisible] = React.useState(false);
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current;
-
-  const markedDates = activities.reduce((acc, activity) => {
-    const date = activity.date.split('T')[0];
-    if (!acc[date]) {
-      acc[date] = { marked: true, dots: [], selectedDayBackgroundColor: colors.primary };
-    }
-    return acc;
-  }, {} as Record<string, any>);
-
-  if (selectedDate) {
-    markedDates[selectedDate] = {
-      ...markedDates[selectedDate],
-      selected: true,
-      selectedColor: colors.primary,
-      selectedTextColor: '#FFFFFF',
-    };
-  }
-
-  const selectedActivities = activities.filter(
-    (activity) => activity.date.split('T')[0] === selectedDate
-  );
 
   const upcomingActivities = activities.filter(
     (activity) => !activity.completed && isAfter(parseISO(activity.date), startOfDay(new Date()))
@@ -87,10 +64,6 @@ export default function CalendarScreen() {
     }
   };
 
-  const handleDateSelect = (day: DateData) => {
-    setSelectedDate(day.dateString);
-  };
-
   return (
     <View style={styles.container}>
       <SafeAreaView edges={['top']} style={styles.safeArea}>
@@ -100,81 +73,14 @@ export default function CalendarScreen() {
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-          <View style={styles.calendarContainer}>
-            <CalendarComponent
-              current={selectedDate}
-              onDayPress={handleDateSelect}
-              markedDates={markedDates}
-              theme={{
-                calendarBackground: colors.backgroundCard,
-                textSectionTitleColor: colors.textSecondary,
-                selectedDayBackgroundColor: colors.primary,
-                selectedDayTextColor: '#FFFFFF',
-                todayTextColor: '#FFFFFF',
-                todayBackgroundColor: colors.primary,
-                dayTextColor: colors.text,
-                textDisabledColor: colors.textMuted,
-                dotColor: colors.success,
-                selectedDotColor: '#FFFFFF',
-                arrowColor: colors.primary,
-                monthTextColor: colors.text,
-                indicatorColor: colors.primary,
-                textDayFontWeight: '400' as const,
-                textMonthFontWeight: '700' as const,
-                textDayHeaderFontWeight: '600' as const,
-                textDayFontSize: 16,
-                textMonthFontSize: 18,
-                textDayHeaderFontSize: 14,
-              }}
-              style={styles.calendar}
-            />
-          </View>
-
-          <View style={styles.activitiesSection}>
-            <Text style={styles.sectionTitle}>
-              {format(parseISO(selectedDate), 'MMMM d, yyyy')}
-            </Text>
-
-            {selectedActivities.length === 0 ? (
+          <View style={styles.upcomingSection}>
+            <Text style={styles.sectionTitle}>Upcoming Workouts</Text>
+            {upcomingActivities.length === 0 ? (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyEmoji}>📅</Text>
-                <Text style={styles.emptyText}>No activities scheduled for this day</Text>
+                <Text style={styles.emptyText}>No upcoming workouts scheduled</Text>
               </View>
             ) : (
-              <View style={styles.activitiesContainer}>
-                {selectedActivities.map((activity, index) => (
-                  <TouchableOpacity
-                    key={activity.id}
-                    style={[
-                      styles.activityCard,
-                      index > 0 && styles.activityCardBorder,
-                    ]}
-                    onPress={() => openWorkoutModal(activity)}
-                  >
-                    <View style={styles.activityInfo}>
-                      <Text style={styles.activityTitle}>{activity.title}</Text>
-                      <Text style={styles.activityType}>{activity.type}</Text>
-                    </View>
-                    <View style={styles.activityRight}>
-                      <View style={styles.durationContainer}>
-                        <Clock color="#9CA3AF" size={16} />
-                        <Text style={styles.durationText}>{activity.duration} min</Text>
-                      </View>
-                      {activity.completed && (
-                        <View style={styles.completedBadge}>
-                          <Check color="#FFFFFF" size={16} />
-                        </View>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
-
-          {upcomingActivities.length > 0 && (
-            <View style={styles.upcomingSection}>
-              <Text style={styles.sectionTitle}>Upcoming Workouts</Text>
               <View style={styles.activitiesContainer}>
                 {upcomingActivities.map((activity, index) => (
                   <TouchableOpacity
@@ -198,8 +104,8 @@ export default function CalendarScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
-            </View>
-          )}
+            )}
+          </View>
         </ScrollView>
       </SafeAreaView>
 
@@ -364,23 +270,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 100,
   },
-  calendarContainer: {
-    marginHorizontal: 20,
-    marginBottom: 24,
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  calendar: {
-    borderRadius: 16,
-  },
-  activitiesSection: {
-    paddingHorizontal: 20,
-  },
+
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700' as const,
@@ -456,7 +346,6 @@ const styles = StyleSheet.create({
   },
   upcomingSection: {
     paddingHorizontal: 20,
-    marginTop: 24,
   },
 
   modalOverlay: {
