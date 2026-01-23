@@ -45,10 +45,6 @@ export default function CalendarScreen() {
     };
   }
 
-  const selectedActivities = activities.filter(
-    (activity) => activity.date.split('T')[0] === selectedDate
-  );
-
   const upcomingActivities = activities.filter(
     (activity) => !activity.completed && isAfter(parseISO(activity.date), startOfDay(new Date()))
   ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -130,51 +126,9 @@ export default function CalendarScreen() {
             />
           </View>
 
-          <View style={styles.activitiesSection}>
-            <Text style={styles.sectionTitle}>
-              {format(parseISO(selectedDate), 'MMMM d, yyyy')}
-            </Text>
-
-            {selectedActivities.length === 0 ? (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyEmoji}>📅</Text>
-                <Text style={styles.emptyText}>No activities scheduled for this day</Text>
-              </View>
-            ) : (
-              <View style={styles.activitiesContainer}>
-                {selectedActivities.map((activity, index) => (
-                  <TouchableOpacity
-                    key={activity.id}
-                    style={[
-                      styles.activityCard,
-                      index > 0 && styles.activityCardBorder,
-                    ]}
-                    onPress={() => openWorkoutModal(activity)}
-                  >
-                    <View style={styles.activityInfo}>
-                      <Text style={styles.activityTitle}>{activity.title}</Text>
-                      <Text style={styles.activityType}>{activity.type}</Text>
-                    </View>
-                    <View style={styles.activityRight}>
-                      <View style={styles.durationContainer}>
-                        <Clock color="#9CA3AF" size={16} />
-                        <Text style={styles.durationText}>{activity.duration} min</Text>
-                      </View>
-                      {activity.completed && (
-                        <View style={styles.completedBadge}>
-                          <Check color="#FFFFFF" size={16} />
-                        </View>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
-
-          {upcomingActivities.length > 0 && (
-            <View style={styles.upcomingSection}>
-              <Text style={styles.sectionTitle}>Upcoming Workouts</Text>
+          <View style={styles.upcomingSection}>
+            <Text style={styles.sectionTitle}>Upcoming Workouts</Text>
+            {upcomingActivities.length > 0 ? (
               <View style={styles.activitiesContainer}>
                 {upcomingActivities.map((activity, index) => (
                   <TouchableOpacity
@@ -198,8 +152,13 @@ export default function CalendarScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
-            </View>
-          )}
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyEmoji}>📅</Text>
+                <Text style={styles.emptyText}>No upcoming workouts scheduled</Text>
+              </View>
+            )}
+          </View>
         </ScrollView>
       </SafeAreaView>
 
@@ -378,9 +337,7 @@ const styles = StyleSheet.create({
   calendar: {
     borderRadius: 16,
   },
-  activitiesSection: {
-    paddingHorizontal: 20,
-  },
+
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700' as const,
