@@ -86,15 +86,11 @@ export default function ProgressScreen() {
                   {weeklyStats.activitiesCompleted} / {profile?.weeklyTarget || 0}
                 </Text>
               </View>
-              <View style={styles.weekStatRow}>
+              <View style={[styles.weekStatRow, styles.weekStatRowLast]}>
                 <Text style={styles.weekStatLabel}>Total Time</Text>
                 <Text style={styles.weekStatValue}>
                   {Math.floor(weeklyStats.totalDuration / 60)}h {weeklyStats.totalDuration % 60}m
                 </Text>
-              </View>
-              <View style={styles.weekStatRow}>
-                <Text style={styles.weekStatLabel}>Distance</Text>
-                <Text style={styles.weekStatValue}>{weeklyStats.totalDistance.toFixed(1)} km</Text>
               </View>
             </View>
           </View>
@@ -224,6 +220,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+  },
+  weekStatRowLast: {
+    borderBottomWidth: 0,
   },
   weekStatLabel: {
     fontSize: 16,
