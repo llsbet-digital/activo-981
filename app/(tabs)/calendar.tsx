@@ -388,20 +388,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   activitiesContainer: {
-    borderRadius: 16,
-    overflow: 'hidden',
+    gap: 12,
   },
   activityCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 20,
     paddingHorizontal: 20,
+    borderRadius: 16,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   activityCardBorder: {
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
   },
   activityInfo: {
     flex: 1,
