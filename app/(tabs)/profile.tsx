@@ -5,8 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { colors } from '@/constants/colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Target, Activity, Settings, Award, Info } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Target, Activity, Settings, Award, Info } from 'lucide-react-native';
 
 export default function ProfileScreen() {
   const { profile, activities } = useApp();
@@ -49,14 +48,6 @@ export default function ProfileScreen() {
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           <View style={styles.profileHeader}>
-            <LinearGradient
-              colors={[colors.primary, colors.primaryLight]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.avatarGradient}
-            >
-              <User color={colors.text} size={48} />
-            </LinearGradient>
             <Text style={styles.name}>{profile?.name || 'Athlete'}</Text>
             <Text style={styles.level}>
               {profile?.level?.charAt(0).toUpperCase() + (profile?.level?.slice(1) || '')} Level
@@ -180,14 +171,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 32,
     paddingHorizontal: 20,
-  },
-  avatarGradient: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
   },
   name: {
     fontSize: 28,
