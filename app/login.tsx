@@ -52,7 +52,14 @@ export default function LoginScreen() {
         : await signIn(email, password);
 
       if (error) {
-        Alert.alert('Error', error.message);
+        if (error.message.toLowerCase().includes('rate limit')) {
+          Alert.alert(
+            'Too Many Requests',
+            'Please wait a few minutes before trying again. Supabase limits email sends to prevent spam.'
+          );
+        } else {
+          Alert.alert('Error', error.message);
+        }
       } else {
         if (isSignUp) {
           setPendingEmail(email);
@@ -82,7 +89,14 @@ export default function LoginScreen() {
     try {
       const { error } = await resendConfirmationEmail(pendingEmail);
       if (error) {
-        Alert.alert('Error', error.message);
+        if (error.message.toLowerCase().includes('rate limit')) {
+          Alert.alert(
+            'Too Many Requests',
+            'Please wait a few minutes before trying again. Email providers limit how often confirmation emails can be sent.'
+          );
+        } else {
+          Alert.alert('Error', error.message);
+        }
       } else {
         Alert.alert(
           'Email Sent ✓',
