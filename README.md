@@ -1,5 +1,21 @@
 # Welcome to your Rork app
 
+## ⚠️ Important: Supabase Email Confirmation Setup
+
+If you're getting a **404 error** when clicking email confirmation links, you need to configure redirect URLs in Supabase.
+
+**Quick Fix:**
+1. Go to [Supabase Dashboard](https://app.supabase.com) → Your Project
+2. Navigate to **Authentication** → **URL Configuration**
+3. Add these to **Redirect URLs**:
+   - `http://localhost:8081/auth/confirm` (for development)
+   - `https://rork.com/auth/confirm` (for production)
+   - `rork-app://auth/confirm` (for mobile)
+
+📖 **Full instructions:** [SUPABASE_EMAIL_CONFIGURATION.md](./SUPABASE_EMAIL_CONFIGURATION.md)
+
+---
+
 ## Project info
 
 This is a native cross-platform mobile app created with [Rork](https://rork.com)

@@ -10,6 +10,23 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Log redirect URL configuration on startup
+  useEffect(() => {
+    const redirectUrl = Platform.OS === 'web' 
+      ? (typeof window !== 'undefined' ? `${window.location.origin}/auth/confirm` : 'http://localhost:8081/auth/confirm')
+      : Linking.createURL('auth/confirm');
+    
+    console.log('=== Auth Configuration ===');
+    console.log('Platform:', Platform.OS);
+    console.log('Email redirect URL:', redirectUrl);
+    console.log('');
+    console.log('⚠️  IMPORTANT: This URL must be configured in Supabase!');
+    console.log('📝 Go to: Supabase Dashboard > Authentication > URL Configuration');
+    console.log('✅ Add this URL to "Redirect URLs":', redirectUrl);
+    console.log('📖 See SUPABASE_EMAIL_CONFIGURATION.md for detailed instructions');
+    console.log('========================');
+  }, []);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
