@@ -42,10 +42,33 @@ This will create:
 
 ## 4. Configure Authentication
 
+### Email Provider Setup
+
 1. In Supabase dashboard, go to **Authentication** > **Providers**
 2. **Email** provider should be enabled by default
-3. Optional: Configure email templates under **Authentication** > **Email Templates**
-4. Optional: For production, disable email confirmation under **Authentication** > **Settings** > **Email Auth**
+3. Configure email templates under **Authentication** > **Email Templates**
+4. **IMPORTANT**: Configure Site URL and Redirect URLs
+
+### Configure Redirect URLs (Required!)
+
+⚠️ **This step is critical to avoid 404 errors on email confirmation**
+
+1. Go to **Authentication** > **URL Configuration**
+2. Set **Site URL** to your app URL:
+   - Development: `http://localhost:8081` (or your dev server URL)
+   - Production: `https://yourdomain.com` or `https://rork.com/`
+
+3. Add **Redirect URLs** (add ALL that apply):
+   ```
+   http://localhost:8081/auth/confirm
+   http://localhost:19006/auth/confirm
+   https://rork.com/auth/confirm
+   rork-app://auth/confirm
+   ```
+
+4. Click **Save**
+
+📖 **For detailed configuration instructions, see [SUPABASE_EMAIL_CONFIGURATION.md](./SUPABASE_EMAIL_CONFIGURATION.md)**
 
 ## 5. Add Environment Variables
 
@@ -131,6 +154,8 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 
 ## Troubleshooting
 
+## Troubleshooting
+
 ### "Failed to fetch"
 - Verify your Supabase URL and anon key are correct
 - Check if your Supabase project is active
@@ -142,6 +167,12 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 ### "Relation does not exist"
 - Make sure you ran the SQL schema in Supabase
 - Verify all tables were created in the public schema
+
+### Email confirmation 404 error
+- **This is the most common issue!**
+- You must configure redirect URLs in Supabase
+- See detailed instructions in [SUPABASE_EMAIL_CONFIGURATION.md](./SUPABASE_EMAIL_CONFIGURATION.md)
+- Quick fix: Add your app URL + `/auth/confirm` to Supabase redirect URLs
 
 ### Email not sending
 - For development, check **Authentication** > **Users** to see if user was created
