@@ -154,8 +154,6 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 
 ## Troubleshooting
 
-## Troubleshooting
-
 ### "Failed to fetch"
 - Verify your Supabase URL and anon key are correct
 - Check if your Supabase project is active
