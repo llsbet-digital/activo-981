@@ -57,6 +57,14 @@ export default function LoginScreen() {
             'Too Many Requests',
             'Please wait a few minutes before trying again. Supabase limits email sends to prevent spam.'
           );
+        } else if (error.message.toLowerCase().includes('email not confirmed')) {
+          setPendingEmail(email);
+          setShowResendEmail(true);
+          Alert.alert(
+            'Email Not Confirmed',
+            'Please check your email for a confirmation link, or tap "Resend" below to get a new one.\n\nAlternatively, you can disable email confirmation in your Supabase dashboard:\nAuthentication > Providers > Email > Disable "Confirm email"',
+            [{ text: 'OK' }]
+          );
         } else {
           Alert.alert('Error', error.message);
         }
