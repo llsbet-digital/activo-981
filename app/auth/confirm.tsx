@@ -13,7 +13,9 @@ export default function ConfirmEmail() {
   useEffect(() => {
     const confirmEmail = async () => {
       try {
-        console.log('Email confirmation params from router:', params);
+        console.log('=== Email Confirmation Debug ===');
+        console.log('Platform:', Platform.OS);
+        console.log('Router params:', params);
         
         let tokenHash = params.token_hash as string || params.token as string;
         let type = params.type as string;
@@ -62,12 +64,24 @@ export default function ConfirmEmail() {
           }
         }
         
-        console.log('Token hash:', tokenHash);
-        console.log('Type:', type);
+        console.log('Final token hash:', tokenHash ? 'Found' : 'Missing');
+        console.log('Final type:', type);
 
         if (!tokenHash) {
+          console.error('❌ No token found in URL');
+          console.error('This usually means:');
+          console.error('1. The email confirmation link is malformed');
+          console.error('2. Supabase redirect URLs are not configured correctly');
+          console.error('3. The URL was modified or corrupted');
+          console.error('');
+          console.error('Please check:');
+          console.error('- Supabase Dashboard > Authentication > URL Configuration');
+          console.error('- Ensure redirect URLs include: ' + (Platform.OS === 'web' 
+            ? `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8081'}/auth/confirm`
+            : 'rork-app://auth/confirm'));
+          
           setStatus('error');
-          setMessage('Invalid confirmation link - missing token');
+          setMessage('Invalid confirmation link - missing token. Please check Supabase redirect URL configuration.');
           setTimeout(() => router.replace('/login' as any), 3000);
           return;
         }
@@ -83,9 +97,23 @@ export default function ConfirmEmail() {
         });
 
         if (error) {
-          console.error('Email confirmation error:', error);
+          console.error('❌ Email confirmation error:', error);
+          console.error('Error message:', error.message);
+          console.error('Error status:', error.status);
+          
+          let errorMessage = error.message || 'Failed to confirm email. Please try again.';
+          
+          // Provide helpful context for common errors
+          if (error.message?.includes('Token has expired') || error.message?.includes('expired')) {
+            errorMessage = 'Confirmation link has expired. Please request a new confirmation email.';
+          } else if (error.message?.includes('invalid') || error.message?.includes('Invalid')) {
+            errorMessage = 'Invalid confirmation link. Please check your email for the correct link or request a new one.';
+          } else if (error.message?.includes('already been consumed')) {
+            errorMessage = 'This confirmation link has already been used. Please sign in or request a new confirmation email.';
+          }
+          
           setStatus('error');
-          setMessage(error.message || 'Failed to confirm email. Please try again.');
+          setMessage(errorMessage);
           setTimeout(() => router.replace('/login' as any), 3000);
         } else {
           console.log('Email confirmed successfully, session:', data.session?.user?.email);
