@@ -46,8 +46,8 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       }
       
       const redirectUrl = Platform.OS === 'web' 
-        ? `${window.location.origin}/auth/confirm`
-        : `${APP_ORIGIN}/auth/confirm`;
+        ? `${window.location.origin}/?confirm=1`
+        : `${APP_ORIGIN}/?confirm=1`;
       
       console.log('📧 Email redirect URL:', redirectUrl);
       
@@ -90,8 +90,8 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   const resendConfirmationEmail = async (email: string): Promise<{ error: AuthError | null }> => {
     try {
       const redirectUrl = Platform.OS === 'web'
-        ? `${window.location.origin}/auth/confirm`
-        : `${APP_ORIGIN}/auth/confirm`;
+        ? `${window.location.origin}/?confirm=1`
+        : `${APP_ORIGIN}/?confirm=1`;
 
       const { error } = await supabase.auth.resend({
         type: 'signup',
