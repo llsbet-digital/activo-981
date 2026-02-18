@@ -12,12 +12,84 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const [confirmStatus, setConfirmStatus] = useState<'idle' | 'verifying' | 'success' | 'error'>('idle');
+  const [confirmMessage, setConfirmMessage] = useState<string>('');
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        const tokenHash = url.searchParams.get('token_hash') || url.searchParams.get('token');
+        const type = url.searchParams.get('type');
+        const accessToken = url.hash
+          ? new URLSearchParams(url.hash.substring(1)).get('access_token')
+          : null;
+
+        if (tokenHash || accessToken) {
+          console.log('🔐 Detected email confirmation params, verifying OTP before auth guard...');
+          setConfirmStatus('verifying');
+
+          if (accessToken && session) {
+            console.log('✅ Session already exists from hash auth');
+            setSession(session);
+            setUser(session.user ?? null);
+            setConfirmStatus('success');
+            setConfirmMessage('Email confirmed successfully!');
+            setIsLoading(false);
+
+            if (typeof window !== 'undefined') {
+              window.history.replaceState({}, '', window.location.pathname);
+            }
+            return;
+          }
+
+          try {
+            const validTypes = ['signup', 'email', 'magiclink', 'recovery', 'invite'];
+            const otpType = validTypes.includes(type ?? '') ? type! : 'signup';
+
+            console.log('🔑 Verifying OTP with type:', otpType, 'token_hash:', tokenHash);
+            const { data, error } = await supabase.auth.verifyOtp({
+              token_hash: tokenHash!,
+              type: otpType as any,
+            });
+
+            if (error) {
+              console.error('❌ OTP verification error:', error.message);
+              setConfirmStatus('error');
+              setConfirmMessage(error.message || 'Failed to confirm email.');
+              setSession(session);
+              setUser(session?.user ?? null);
+            } else {
+              console.log('✅ OTP verified, user:', data.session?.user?.email);
+              setSession(data.session);
+              setUser(data.session?.user ?? null);
+              setConfirmStatus('success');
+              setConfirmMessage('Email confirmed successfully!');
+            }
+          } catch (err: any) {
+            console.error('❌ OTP verification exception:', err);
+            setConfirmStatus('error');
+            setConfirmMessage(err?.message || 'An error occurred during confirmation.');
+            setSession(session);
+            setUser(session?.user ?? null);
+          }
+
+          if (typeof window !== 'undefined') {
+            window.history.replaceState({}, '', window.location.pathname);
+          }
+          setIsLoading(false);
+          return;
+        }
+      }
+
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
-    });
+    };
+
+    init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log('Auth state changed:', _event);
@@ -172,5 +244,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
     resendConfirmationEmail,
     isAuthenticated: !!user,
     isEmailConfirmed: user?.email_confirmed_at ? true : false,
+    confirmStatus,
+    confirmMessage,
   };
 });
