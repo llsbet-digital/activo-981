@@ -5,6 +5,8 @@ import createContextHook from '@nkzw/create-context-hook';
 import * as Linking from 'expo-linking';
 import { supabase } from '@/lib/supabase';
 
+const APP_ORIGIN = 'https://p_52apzaa5go3z18qrndmlu.rork.live';
+
 export const [AuthProvider, useAuth] = createContextHook(() => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -45,7 +47,7 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
       
       const redirectUrl = Platform.OS === 'web' 
         ? `${window.location.origin}/auth/confirm`
-        : Linking.createURL('auth/confirm');
+        : `${APP_ORIGIN}/auth/confirm`;
       
       console.log('📧 Email redirect URL:', redirectUrl);
       
@@ -87,9 +89,16 @@ export const [AuthProvider, useAuth] = createContextHook(() => {
 
   const resendConfirmationEmail = async (email: string): Promise<{ error: AuthError | null }> => {
     try {
+      const redirectUrl = Platform.OS === 'web'
+        ? `${window.location.origin}/auth/confirm`
+        : `${APP_ORIGIN}/auth/confirm`;
+
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
       });
       return { error };
     } catch (error) {
